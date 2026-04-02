@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flash Castelo Foodtruck | Dashboard</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="logo">
+      <h1>Flash Castelo</h1>
+      <p>Foodtruck - Painel Operacional</p>
+    </div>
+
+    <nav class="menu">
+      <button data-view="dashboard" class="active">Dashboard</button>
+      <button data-view="products">Ingredientes</button>
+      <button data-view="stock">Estoque + Maquininha</button>
+    </nav>
+
+    <div class="auth-box">
+      <input id="email" type="email" placeholder="Email" value="admin@flashcastelo.com" />
+      <input id="password" type="password" placeholder="Senha" value="123456" />
+      <button id="loginBtn">Entrar</button>
+      <small id="authStatus">Não autenticado</small>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="header">
+      <h2 id="viewTitle">Dashboard</h2>
+      <div class="filters">
+        <input type="date" id="fromDate" />
+        <input type="date" id="toDate" />
+        <button id="refreshBtn">Atualizar</button>
+      </div>
+    </header>
+
+    <section id="dashboardView" class="view">
+      <div class="cards" id="kpiCards"></div>
+      <div class="panel">
+        <h3>Top Produtos</h3>
+        <ul id="topProducts"></ul>
+      </div>
+    </section>
+
+    <section id="productsView" class="view hidden">
+      <div class="panel">
+        <h3>Catálogo de Ingredientes</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Ingrediente</th>
+              <th>Categoria</th>
+              <th>Preço</th>
+              <th>Estoque</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="stockView" class="view hidden">
+      <div class="panel">
+        <h3>Estoque Crítico</h3>
+        <ul id="lowStockList"></ul>
+      </div>
+      <div class="panel">
+        <h3>Maquininha REDE (API)</h3>
+        <ul id="redeStatusList"></ul>
+      </div>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Flash Castelo | Sistema PDV Integrado</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+	<div class="sidebar">
+		<div class="logo">
+			<img src="Img/logo.jpg" alt="Logo da castelo bebidas">
+			<h2>Flash Castelo</h2>
+			<p>Foodtruck Burger Station</p>
+		</div>
+
+		<div class="menu">
+			
+			<button class="active" data-view="dashboard">Dashboard</button>
+			<button data-view="pdv">Ingredientes</button>
+			<button data-view="tabacaria">Adicionais</button>
+			<button data-view="inventory">Estoque + Maquininha</button>
+			<button data-view="reports">Relatórios</button>
+			<button data-view="analytics">Análises</button>
+			<button data-view="settings">Configurações</button>
+		</div>
+
+		<button class="theme-toggle" onclick="toggleTheme()">Ativar modo claro</button>
+
+		<div class="sidebar-footer">
+			Sistema de Gestão para Foodtruck<br>
+			Demonstração Comercial 2026
+		</div>
+	</div>
+
+	<div class="main">
+		<!-- ========== DASHBOARD ========== -->
+		<div id="dashboard" class="view active">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Painel Estratégico do Foodtruck</h1>
+				</div>
+				<div class="meta">Hoje, 04 Mar 2026 • Turno Noite • Caixa #03</div>
+			</div>
+
+			<div class="dashboard">
+				<div class="card">
+					<h2>Vendas Hoje</h2>
+					<span>R$ 0,00</span>
+					<div class="kpi-trend">Sem movimentação</div>
+				</div>
+				<div class="card">
+					<h2>Itens Vendidos</h2>
+					<span>0</span>
+					<div class="kpi-trend">Sem movimentação</div>
+				</div>
+				<div class="card">
+					<h2>Ticket Médio</h2>
+					<span>R$ 0,00</span>
+					<div class="kpi-trend">Sem movimentação</div>
+				</div>
+				<div class="card">
+					<h2>Lucro Líquido</h2>
+					<span>R$ 0,00</span>
+					<div class="kpi-trend">Sem movimentação</div>
+				</div>
+				<div class="card">
+					<h2>Estoque Crítico</h2>
+					<span>0</span>
+					<div class="kpi-trend">Sem dados</div>
+				</div>
+				<div class="card">
+					<h2>Itens em Estoque</h2>
+					<span>0</span>
+					<div class="kpi-trend">Sem dados</div>
+				</div>
+				<div class="card">
+					<h2>Tempo de Caixa</h2>
+					<span>0h 00min</span>
+					<div class="kpi-trend">Sem dados</div>
+				</div>
+				<div class="card">
+					<h2>Clientes Hoje</h2>
+					<span>0</span>
+					<div class="kpi-trend">Sem dados</div>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">Desempenho por Categoria</h3>
+					<div class="sales-bars">
+						<div class="bar-row">
+							<div>Lanches</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Adicionais</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Porções</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Sobremesas</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Insumos</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+					</div>
+
+					<h3 class="section-title" style="margin-top: 16px;">Produtos Destaque</h3>
+					<div style="font-size: 12px; line-height: 1.8;">
+						<div style="color: var(--muted);">Sem vendas registradas.</div>
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Mix de Pagamento</h3>
+					<div class="payment-grid">
+						<div class="payment-item">
+							PIX
+							<strong>0%</strong>
+						</div>
+						<div class="payment-item">
+							Cartão
+							<strong>0%</strong>
+						</div>
+						<div class="payment-item">
+							Dinheiro
+							<strong>0%</strong>
+						</div>
+					</div>
+
+					<h3 class="section-title" style="margin-top: 14px;">Alertas Críticos</h3>
+					<div class="alerts">
+						<div class="alert">Sem alertas no momento.</div>
+					</div>
+
+					<h3 class="section-title" style="margin-top: 14px;">Reposição de Ingredientes</h3>
+					<div style="font-size: 11px; line-height: 1.8; background: #1a2414; padding: 8px; border-radius: 6px;">
+						<div style="margin-bottom: 6px;"><strong style="color: #fbbf24;">🧊 Ingredientes Necessários:</strong></div>
+						<div style="font-size: 10px; color: #8ae08a; margin-left: 12px;">
+							• Sem dados no momento
+						</div>
+						<div style="margin-top: 6px; margin-bottom: 6px;"><strong style="color: #fbbf24;">📦 Estoque OK:</strong></div>
+						<div style="font-size: 10px; color: #8ae08a; margin-left: 12px;">
+							• Sem dados no momento
+						</div>
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Performance do Dia</h3>
+					<div style="font-size: 11px; line-height: 1.8;">
+						<div style="background: #1a2a1a; padding: 8px; border-radius: 6px; margin-bottom: 8px;">
+							<div><strong style="color: #8ae08a;">▲ Maior venda:</strong> Sem dados</div>
+							<div><strong style="color: #8ae08a;">📦 Maior saída:</strong> Sem dados</div>
+							<div><strong style="color: #fbbf24;">💰 Faturamento/hora:</strong> R$ 0,00</div>
+							<div><strong style="color: #fbbf24;">⏱️ Tempo médio:</strong> 0 min/venda</div>
+						</div>
+					</div>
+
+					<h3 class="section-title">Estoque Crítico Detalhado</h3>
+					<table class="table-simple" style="font-size: 10px;">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Qtd</th>
+								<th>Mín</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="3" style="text-align:center; color: var(--muted);">Sem dados</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== PDV ========== -->
+		<div id="pdv" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Ingredientes — Seleção para Produção</h1>
+				</div>
+				<div class="meta">Integrado com SDK Rede (Laranjinha Smart)</div>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 320px; gap: 14px;">
+				<div>
+					<h2>Ingredientes e Bases</h2>
+					<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;">
+						<button class="btn-secondary drink-tab active" data-type="paes" onclick="filterByType('paes'); renderProducts();">Pães</button>
+						<button class="btn-secondary drink-tab" data-type="proteinas" onclick="filterByType('proteinas'); renderProducts();">Proteínas</button>
+						<button class="btn-secondary drink-tab" data-type="queijos" onclick="filterByType('queijos'); renderProducts();">Queijos</button>
+						<button class="btn-secondary drink-tab" data-type="molhos" onclick="filterByType('molhos'); renderProducts();">Molhos</button>
+					</div>
+					<div class="products-grid" id="productsGrid"></div>
+				</div>
+
+				<div class="cart-section">
+					<h3 style="margin-top: 0; color: var(--amarelo);">Carrinho</h3>
+					<div id="cartItems" class="cart-items">
+						<span style="color: var(--muted); text-align: center; font-size: 12px;">Vazio</span>
+					</div>
+
+					<div class="cart-summary">
+						<div class="cart-line">
+							<div>Subtotal:</div>
+							<div style="text-align: right;" id="subtotal">R$ 0,00</div>
+						</div>
+						<div class="cart-line">
+							<div>Desconto:</div>
+							<div style="text-align: right;">
+								<input type="number" id="discount" value="0" step="0.01" onchange="updateTotal()" style="width: 70px;">
+							</div>
+						</div>
+						<div class="cart-total">
+							<div id="total">R$ 0,00</div>
+						</div>
+					</div>
+
+					<div style="padding: 12px; background: #1a2414; border: 1px solid #3a4a3a; border-radius: 8px; margin-bottom: 12px;">
+						<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">💳 Pagamento</h4>
+						<select id="paymentMethod" style="width: 100%; margin-bottom: 8px;">
+							<option value="card">Cartão (Rede)</option>
+							<option value="pix">PIX</option>
+							<option value="cash">Dinheiro</option>
+						</select>
+						<div style="padding: 8px; background: #0f1a0f; border-radius: 4px; margin-top: 8px; font-size: 11px; color: #8ae08a;">
+							<strong>Status Rede:</strong> Conectado ✓<br>
+							<strong>POS:</strong> POS-001 (Laranjinha Smart)<br>
+						</div>
+					</div>
+
+					<button class="btn-pay" onclick="finalizePay()">Processar Pagamento</button>
+					<button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="clearCart()">Limpar</button>
+				</div>
+			</div>
+		</div>
+
+		<!--========== ADICIONAIS ========== -->
+		<div id="tabacaria" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Adicionais e Porções</h1>
+				</div>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 320px; gap: 14px;">
+				<div>
+					<h2>Itens Complementares</h2>
+					<div class="products-grid" id="tabacariGrid"></div>
+				</div>
+
+				<div class="cart-section">
+					<h3 style="margin-top: 0; color: var(--amarelo);">Carrinho</h3>
+					<div id="cartItems" class="cart-items">
+						<span style="color: var(--muted); text-align: center; font-size: 12px;">Vazio</span>
+					</div>
+
+					<div class="cart-summary">
+						<div class="cart-line">
+							<div>Subtotal:</div>
+							<div style="text-align: right;" id="subtotal">R$ 0,00</div>
+						</div>
+						<div class="cart-line">
+							<div>Desconto:</div>
+							<div style="text-align: right;">
+								<input type="number" id="discount" value="0" step="0.01" onchange="updateTotal()" style="width: 70px;">
+							</div>
+						</div>
+						<div class="cart-total">
+							<div id="total">R$ 0,00</div>
+						</div>
+					</div>
+
+					<div style="padding: 12px; background: #1a2414; border: 1px solid #3a4a3a; border-radius: 8px; margin-bottom: 12px;">
+						<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">💳 Pagamento</h4>
+						<select id="paymentMethod" style="width: 100%; margin-bottom: 8px;">
+							<option value="card">Cartão (Rede)</option>
+							<option value="pix">PIX</option>
+							<option value="cash">Dinheiro</option>
+						</select>
+						<div style="padding: 8px; background: #0f1a0f; border-radius: 4px; margin-top: 8px; font-size: 11px; color: #8ae08a;">
+							<strong>Status Rede:</strong> Conectado ✓<br>
+							<strong>POS:</strong> POS-001 (Laranjinha Smart)<br>
+						</div>
+					</div>
+
+					<button class="btn-pay" onclick="finalizePay()">Processar Pagamento</button>
+					<button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="clearCart()">Limpar</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== INVENTORY ========== -->
+		<div id="inventory" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Estoque + Maquininha API REDE</h1>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">📝 Cadastrar Novo Produto</h3>
+					<div class="input-field">
+						<label>Nome do Produto</label>
+						<input type="text" id="newProductName" placeholder="Ex: Blend Bovino 100g">
+					</div>
+					<div class="input-field">
+						<label>Categoria</label>
+						<select id="newProductCategory">
+							<option value="ingredientes:paes">Ingrediente - Pães</option>
+							<option value="ingredientes:proteinas">Ingrediente - Proteínas</option>
+							<option value="ingredientes:queijos">Ingrediente - Queijos</option>
+							<option value="ingredientes:molhos">Ingrediente - Molhos</option>
+							<option value="adicionais:">Adicional - Porções</option>
+							<option value="adicionais:">Adicional - Sobremesas</option>
+						</select>
+					</div>
+					<div class="input-field">
+						<label>Preço (R$)</label>
+						<input type="number" id="newProductPrice" placeholder="Ex: 24.90" step="0.01" min="0">
+					</div>
+					<div class="input-field">
+						<label>Quantidade Inicial</label>
+						<input type="number" id="newProductStock" placeholder="Ex: 12" min="0">
+					</div>
+					<div class="input-field">
+						<label>Estoque Mínimo</label>
+						<input type="number" id="newProductMinStock" placeholder="Ex: 5" min="0">
+					</div>
+					<div class="input-field">
+						<label>Código de Barras (opcional)</label>
+						<input type="text" id="newProductBarcode" placeholder="Ex: 7891119NOVO01">
+					</div>
+					<div class="input-field">
+						<label>Descrição (opcional)</label>
+						<input type="text" id="newProductDesc" placeholder="Ex: Porção 100g">
+					</div>
+					<button class="btn-secondary" style="width: 100%; background: linear-gradient(135deg, #8ae08a 0%, #4ade80 100%); color: #0a0a0a; font-weight: bold;" onclick="addNewProduct()">✓ Adicionar ao PDV</button>
+					<div style="font-size: 10px; color: #888; margin-top: 8px; text-align: center;">
+						✓ Produto aparecerá automaticamente na lista de vendas
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Entrada de Estoque</h3>
+					<div class="input-field">
+						<label>Produto</label>
+						<select id="purchaseProductSelect">
+						</select>
+					</div>
+					<div class="input-field">
+						<label>Quantidade</label>
+						<input type="number" id="purchaseQtyInput" placeholder="Ex: 24" min="1">
+					</div>
+					<div class="input-field">
+						<label>Custo Unitário (R$)</label>
+						<input type="number" id="purchaseUnitCostInput" placeholder="Ex: 8.50" step="0.01" min="0">
+					</div>
+					<div class="input-field">
+						<label>Observação</label>
+						<input type="text" id="purchaseNoteInput" placeholder="Fornecedor, lote, etc...">
+					</div>
+					<button class="btn-secondary" style="width: 100%;" onclick="registerPurchase()">Registrar Compra</button>
+
+					<div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--borda); display: grid; gap: 8px;">
+						<div style="font-size: 12px; color: var(--muted);">Resumo Financeiro</div>
+						<div style="display: flex; justify-content: space-between; font-size: 13px;">
+							<div>🧾 Compras acumuladas:</div>
+							<div id="totalPurchasesValue" style="color: #f59e0b; font-weight: bold;">R$ 0,00</div>
+						</div>
+						<div style="display: flex; justify-content: space-between; font-size: 13px;">
+							<div>💰 Vendas acumuladas:</div>
+							<div id="totalSalesValue" style="color: #8ae08a; font-weight: bold;">R$ 0,00</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">Produtos em Estoque</h3>
+					<table id="inventoryTable" class="table-simple">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Qtd</th>
+								<th>Mín</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="4" style="text-align:center; color: var(--muted);">Nenhum item cadastrado.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Status Maquininha API REDE</h3>
+					<div id="inventoryMachineStatus" style="font-size: 12px; line-height: 1.8; background: #131d13; border: 1px solid #2d412d; border-radius: 8px; padding: 10px;">
+						<div><strong style="color: #8ae08a;">Provedor:</strong> <span id="invProvider">REDE</span></div>
+						<div><strong style="color: #8ae08a;">Terminal:</strong> <span id="invTerminal">POS-001</span></div>
+						<div><strong style="color: #8ae08a;">Modo:</strong> <span id="invMode">Sandbox</span></div>
+						<div><strong style="color: #8ae08a;">URL API:</strong> <span id="invApiUrl">api-sandbox.rede.com.br</span></div>
+						<div><strong style="color: #8ae08a;">Conectividade:</strong> <span id="invConnectivity">Operacional</span></div>
+						<div><strong style="color: #8ae08a;">Último ping:</strong> <span id="invLastPing">há 18s</span></div>
+						<div><strong style="color: #8ae08a;">Itens críticos:</strong> <span id="invLowStockCount">--</span></div>
+					</div>
+					<div id="inventoryCriticalList" style="margin-top: 8px; font-size: 11px; color: #9ca3af;">Carregando dados do backend...</div>
+					<div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+						<button class="btn-secondary" style="width: 100%;" onclick="refreshInventoryMachineOverview(true)">Testar API</button>
+						<button class="btn-secondary" style="width: 100%;" onclick="refreshInventoryMachineOverview(false)">Sincronizar POS</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== REPORTS ========== -->
+		<div id="reports" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Relatórios e Análises Avançadas</h1>
+				</div>
+				<div class="meta">Período: últimos 7 dias | Aguardando dados</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">Vendas por Dia</h3>
+					<div class="sales-bars">
+						<div class="bar-row">
+							<div>Seg</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Ter</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Qua</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Qui</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Sex</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Sáb</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+						<div class="bar-row">
+							<div>Dom</div>
+							<div class="bar"><span style="width: 0%"></span></div>
+							<div>R$ 0,00</div>
+						</div>
+					</div>
+
+					<h3 class="section-title" style="margin-top: 16px;">Vendas por Categoria (últimos 7 dias)</h3>
+					<table class="table-simple">
+						<thead>
+							<tr>
+								<th>Categoria</th>
+								<th>Qtd</th>
+								<th>Faturamento</th>
+								<th>%</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="4" style="text-align:center; color: var(--muted);">Sem dados no período.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Top 10 Produtos Mais Vendidos</h3>
+					<table class="table-simple">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Qtd</th>
+								<th>Faturamento</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="3" style="text-align:center; color: var(--muted);">Sem vendas registradas.</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h3 class="section-title" style="margin-top: 16px;">Análise Financeira</h3>
+					<div style="font-size: 12px; line-height: 1.8;">
+						<div style="background: #1a2a1a; padding: 8px; border-radius: 6px; margin-bottom: 8px;">
+							<div><strong style="color: #8ae08a;">Faturamento Total:</strong> R$ 0,00</div>
+							<div><strong style="color: #8ae08a;">Custo Total:</strong> R$ 0,00</div>
+							<div><strong style="color: var(--amarelo);">Lucro Bruto:</strong> R$ 0,00</div>
+							<div><strong style="color: var(--amarelo);">Margem:</strong> 0,0%</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== ANÁLISES ========== -->
+		<div id="analytics" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">ANÁLISES AVANÇADAS</div>
+					<h1>Painel de Vendas com Gráficos</h1>
+				</div>
+				<div class="meta">Análise em tempo real | Últimos 30 dias</div>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+				<div class="card">
+					<h2>Receita - Hoje</h2>
+					<span id="analyticsRevenueToday">R$ 0,00</span>
+					<div class="kpi-trend" id="analyticsRevenueTrend">▲ Carregando...</div>
+				</div>
+				<div class="card">
+					<h2>Receita - 30 dias</h2>
+					<span id="analyticsRevenueMonth">R$ 0,00</span>
+					<div class="kpi-trend">Período completo</div>
+				</div>
+				<div class="card">
+					<h2>Transações - Hoje</h2>
+					<span id="analyticsTicketsToday">0</span>
+					<div class="kpi-trend">Caixa aberto</div>
+				</div>
+				<div class="card">
+					<h2>Ticket Médio</h2>
+					<span id="analyticsAvgTicket">R$ 0,00</span>
+					<div class="kpi-trend">Últimos 30 dias</div>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="chart-container">
+					<h3 class="section-title">Faturamento vs Transações (30 dias)</h3>
+					<div class="chart-wrapper">
+						<canvas id="revenueChart"></canvas>
+					</div>
+				</div>
+				<div class="chart-container">
+					<h3 class="section-title">Vendas por Categoria</h3>
+					<div class="chart-wrapper">
+						<canvas id="categoryChart"></canvas>
+					</div>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="chart-container">
+					<h3 class="section-title">Top 10 Produtos Mais Vendidos</h3>
+					<table class="table-simple">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Qtd</th>
+								<th>Faturamento</th>
+								<th>%</th>
+							</tr>
+						</thead>
+						<tbody id="topProductsBody">
+							<tr><td colspan="4" style="text-align: center; color: var(--muted);">Carregando...</td></tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="chart-container">
+					<h3 class="section-title">Busca Rápida de Produtos</h3>
+					<div class="search-container">
+						<span class="search-icon">•</span>
+						<input type="text" class="search-input" id="productSearchBox" placeholder="Digite nome ou código..." onkeyup="handleQuickSearch(event)">
+						<div class="search-results" id="quickSearchResults"></div>
+					</div>
+					<div style="margin-top: 12px; font-size: 11px; color: var(--muted);">
+						Digite para buscar produtos por nome ou código de barras. Clique para adicionar ao carrinho da aba Ingredientes.
+					</div>
+				</div>
+			</div>
+
+			<div style="padding: 20px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(0,0,0,0) 100%); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 12px; margin-top: 20px;">
+				<h3 style="margin-top: 0; color: var(--amarelo);">💡 Integração com Backend Node.js</h3>
+				<div style="font-size: 13px; color: var(--texto-sec); line-height: 1.8;">
+					<p>Os gráficos carregam dados via API em <strong>http://localhost:3333/api</strong></p>
+					<p style="color: #8ae08a;">✓ Endpoints implementados:</p>
+					<ul style="margin: 10px 0; padding-left: 20px;">
+						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/summary</code> - KPIs período</li>
+						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/revenue-chart</code> - Gráfico receita</li>
+						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/category-chart</code> - Gráfico categorias</li>
+						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/products-search?q=termo</code> - Busca de produtos</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== SETTINGS ========== -->
+		<div id="settings" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Configurações do Sistema POS</h1>
+				</div>
+				<div class="meta">Gerenciar loja e preferências</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">Dados da Loja</h3>
+					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">Nome da Loja</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="Flash Castelo">
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">CNPJ</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="12.345.678/0001-90">
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">Telefone</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="(11) 98765-4321">
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">E-mail</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="contato@flashcastelo.com">
+						</div>
+					</div>
+
+					<h3 class="section-title">Horários de Operação</h3>
+				<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11px;">
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Segunda-feira:</strong> <span style="color: #f59e0b;">Fechado</span>
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Terça-feira:</strong> 17h00 – 00h00
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Quarta-feira:</strong> 17h00 – 00h00
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Quinta-feira:</strong> 18h00 – 02h00
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Sexta-feira:</strong> 18h00 – 02h30
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Sábado:</strong> 18h00 – 02h30
+					</div>
+					<div style="padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Domingo:</strong> <span style="color: #f59e0b;">Fechado</span>
+					</div>
+
+					<h3 class="section-title">Metas Operacionais</h3>
+					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px;">
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">Meta de Vendas Diária (R$)</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="600">
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">Margem Mínima (%)</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="36">
+						</div>
+						<div>
+							<label style="font-size: 11px; color: #888;">Ticket Médio Esperado (R$)</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="48"
+						</div>
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Integração Rede Laranjinha Smart</h3>
+					<div style="background: linear-gradient(135deg, #1a2a1a 0%, #1a1a2a 100%); padding: 12px; border-radius: 6px; border: 1px solid #3a4a3a; margin-bottom: 12px;">
+						<div style="display: flex; align-items: center; margin-bottom: 12px;">
+							<span id="redeStatusIndicator" style="width: 12px; height: 12px; background: #fbbf24; border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite;"></span>
+							<span id="redeStatusText" style="color: #fbbf24;"><strong>Detectando servidor...</strong></span>
+						</div>
+						<div style="font-size: 11px; color: #8ae08a; line-height: 1.8;">
+							<div><strong>Modo:</strong> <span id="paymentMode">Verificando...</span></div>
+							<div><strong>Servidor API:</strong> <span id="serverStatus">Conectando...</span></div>
+							<div><strong>Terminal ID:</strong> POS-001</div>
+							<div><strong>Série:</strong> LRJ008-000421</div>
+							<div><strong>Modelo:</strong> Laranjinha Smart (Maquininha)</div>
+							<div><strong>Firmware:</strong> v2.4.1</div>
+							<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #3a4a3a;">
+								<div><strong>Última Transação:</strong> <span id="lastTransaction">Nenhuma</span></div>
+								<div><strong>Transações Hoje:</strong> <span id="transactionsCount">0</span></div>
+								<div><strong>Total Processado:</strong> R$ <span id="totalProcessed">0,00</span></div>
+							</div>
+							<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #3a4a3a;">
+								<div><strong>Status API:</strong> <span id="apiStatus">Conectando...</span></div>
+								<div><strong>Latência:</strong> <span id="latency">--ms</span></div>
+								<div><strong>Última Sincronização:</strong> <span id="lastSync">Nunca</span></div>
+								<div><strong>Segurança:</strong> <span id="securityStatus">Verificando...</span></div>
+							</div>
+						</div>
+					</div>
+
+					<h3 class="section-title">Configurações de Transação</h3>
+					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11px;">
+						<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+							<div>
+								<label style="display: block; color: #888; margin-bottom: 4px;">Tipo de Transação</label>
+								<select style="width: 100%; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;">
+									<option>Débito</option>
+									<option selected>Crédito</option>
+									<option>Vale Refeição</option>
+								</select>
+							</div>
+							<div>
+								<label style="display: block; color: #888; margin-bottom: 4px;">Parcelas</label>
+								<select style="width: 100%; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;">
+									<option selected>À Vista (1x)</option>
+									<option>2x</option>
+									<option>3x</option>
+									<option>6x</option>
+									<option>12x</option>
+								</select>
+							</div>
+						</div>
+						<div style="display: flex; gap: 8px;">
+							<button style="flex: 1; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px; cursor: pointer; font-size: 11px;" onclick="refreshInventoryMachineOverview(true)">Testar Conexão</button>
+							<button style="flex: 1; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px; cursor: pointer; font-size: 11px;" onclick="refreshInventoryMachineOverview(false)">Sincronizar Agora</button>
+						</div>
+					</div>
+
+					<h3 class="section-title">Métodos de Pagamento</h3>
+					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox" checked> Cartão de Crédito (Rede)
+							</label>
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox" checked> Cartão de Débito (Rede)
+							</label>
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox" checked> PIX
+							</label>
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox" checked> Dinheiro
+							</label>
+						</div>
+						<div>
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox"> Vale Refeição/Alimentação
+							</label>
+						</div>
+					</div>
+
+					<h3 class="section-title">Pontos de Reposição</h3>
+					<table class="table-simple" style="font-size: 11px;">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Mín</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><strong>Pão Brioche</strong></td>
+								<td><input type="text" style="width: 40px; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 3px;" value="60"></td>
+							</tr>
+							<tr>
+								<td><strong>Blend Bovino 100g</strong></td>
+								<td><input type="text" style="width: 40px; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 3px;" value="40"></td>
+							</tr>
+							<tr>
+								<td><strong>Cheddar Cremoso</strong></td>
+								<td><input type="text" style="width: 40px; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 3px;" value="30"></td>
+							</tr>
+							<tr>
+								<td><strong>Batata 2,5kg</strong></td>
+								<td><input type="text" style="width: 40px; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 3px;" value="15"></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h3 class="section-title" style="margin-top: 12px;">Backup & Sincronização</h3>
+					<div style="font-size: 11px;">
+						<button style="width: 100%; padding: 8px; background: #facc15; color: #090909; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 8px;"><strong>↓ Fazer Backup Agora</strong></button>
+						<button style="width: 100%; padding: 8px; background: #333; color: #ccc; border: none; border-radius: 4px; cursor: pointer;"><strong>↑ Sincronizar com Nuvem</strong></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- PAYMENT MODAL -->
+	<div id="paymentModal" class="modal-overlay">
+		<div class="modal">
+			<h3>Processar Pagamento</h3>
+			<div style="padding: 12px; background: var(--preto-card-2); border-radius: 8px; margin-bottom: 12px;">
+				<div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; font-size: 13px;">
+					<div>Total:</div>
+					<div style="text-align: right; color: var(--amarelo); font-weight: bold;" id="modalTotal">R$ 0,00</div>
+					<div>Método:</div>
+					<div style="text-align: right;" id="modalMethod">Cartão (Rede)</div>
+				</div>
+			</div>
+
+			<div id="cardPaymentUI" style="padding: 12px; background: #1a2414; border: 1px solid #3a4a3a; border-radius: 8px; margin-bottom: 12px;">
+				<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">🔗 Integração Rede Laranjinha Smart</h4>
+				
+				<!-- Status Conexão -->
+				<div style="font-size: 12px; color: #8ae08a; margin-bottom: 12px; padding: 8px; background: #0f1a0f; border-radius: 4px; border-left: 3px solid #8ae08a;">
+					<div style="display: flex; align-items: center; margin-bottom: 6px;">
+						<span id="connectionStatus" style="width: 12px; height: 12px; background: #8ae08a; border-radius: 50%; margin-right: 8px; display: inline-block; animation: pulse 2s infinite;"></span>
+						<strong id="connectionText">Conectado ao POS-001</strong>
+					</div>
+					<div style="font-size: 11px; color: #6db86d; margin-top: 4px;">
+						Série: LRJ008-000421 | Firmware: v2.4.1
+					</div>
+				</div>
+
+				<!-- Fluxo de Pagamento -->
+				<div id="paymentFlow" style="padding: 12px; background: #0f1a0f; border-radius: 4px;">
+					<div style="text-align: center; margin-bottom: 12px;">
+						<div style="font-size: 28px; margin-bottom: 8px;">💳</div>
+						<div id="paymentStage" style="font-size: 13px; font-weight: bold; color: var(--amarelo);">Aguardando cartão...</div>
+						<div id="paymentStageDesc" style="font-size: 11px; color: #8ae08a; margin-top: 4px;">Aproxime o cartão, insira ou passe</div>
+					</div>
+					
+					<!-- Barra de progresso -->
+					<div style="height: 24px; background: #0a0f0a; border-radius: 4px; overflow: hidden; position: relative;">
+						<div id="progressBar" style="height: 100%; background: linear-gradient(90deg, #8ae08a 0%, #4ade80 100%); width: 0%; transition: width 0.3s ease; display: flex; align-items: center; justify-content: center;">
+							<span id="progressText" style="font-size: 10px; color: #000; font-weight: bold;"></span>
+						</div>
+					</div>
+					
+					<!-- Informações detalhadas -->
+					<div id="paymentDetails" style="font-size: 11px; color: #8ae08a; margin-top: 12px; display: none;">
+						<div style="padding: 8px; background: #1a2414; border-radius: 3px; line-height: 1.6;">
+							<div><strong>NSU:</strong> <span id="nsuNumber">000000</span></div>
+							<div><strong>Autorizador:</strong> <span id="authorizer">Aguardando...</span></div>
+							<div><strong>Código Auth:</strong> <span id="authCode">-</span></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="paymentActions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+				<button class="btn-secondary" style="width: 100%;" onclick="closePaymentModal()">Cancelar</button>
+				<button class="btn-pay" style="margin: 0;" id="confirmPaymentBtn" onclick="confirmPayment()">Processar</button>
+			</div>
+		</div>
+	</div>
+
+	<script src="script.js"></script>
+</body>
+</html>
