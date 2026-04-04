@@ -499,6 +499,7 @@
 				return;
 			}
 
+			document.getElementById('confirmation-window').classList.remove('Hidde');
 			const method = document.getElementById('paymentMethod').value;
 			const methodLabel = { card: 'Cartão (Rede)', pix: 'PIX', cash: 'Dinheiro' }[method];
 			document.getElementById('modalMethod').textContent = methodLabel;
@@ -513,6 +514,11 @@
 
 			document.getElementById('paymentModal').classList.add('active');
 		}
+
+		function esconder()
+		{
+    		document.getElementById('confirmation-window').classList.add('Hidde');
+  		}
 
 		function simulateRedeConnection() {
 			const statusEl = document.getElementById('connectionStatus');
