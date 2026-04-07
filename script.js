@@ -435,6 +435,7 @@
 				cart.push({ ...product, qty: 1 });
 			}
 			renderCart();
+			confirmBuyWindow()
 			renderProducts();
 			renderTabacaria();
 			updateInventoryTable();
@@ -459,12 +460,42 @@
 			updateTotal();
 		}
 
+		function confirmBuyWindow(){
+			const win = document.getElementById('finalCartItens');
+			const method = document.getElementById('paymentMethod').value;
+			const methodLabel = { card: 'Cartão (Rede)', pix: 'PIX', cash: 'Dinheiro' }[method];
+
+			win.innerHTML = cart.map((item, idx) => `
+				<div class="cart-itens-confirm">
+					<div class="itens-list">
+						<p><b>${item.name} X${item.qty}</b></p>
+						<p style="margin-left: 105px;"><span>R$${(item.price * item.qty).toFixed(2)}</span></p>
+						<button class="btn-X" onclick="removeFromCart(${idx})"><b>×</b></button>
+					</div>
+					<p>Métod de pagamento ${methodLabel}</p>
+				</div>
+			`).join('');
+
+			updateTotal();
+		}
+
+		function finalizaCompra(){
+			cart = [];
+			renderCart();
+			confirmBuyWindow()
+			renderProducts();
+			renderTabacaria();
+			updateInventoryTable();
+			esconder();
+		}
+
 		function removeFromCart(idx) {
 			const item = cart[idx];
 			// Devolve ao estoque
 			stockData[item.id] += item.qty;
 			cart.splice(idx, 1);
 			renderCart();
+			confirmBuyWindow()
 			renderProducts();
 			renderTabacaria();
 			updateInventoryTable();
@@ -488,6 +519,7 @@
 			}
 			cart = [];
 			renderCart();
+			confirmBuyWindow()
 			renderProducts();
 			renderTabacaria();
 			updateInventoryTable();
