@@ -462,18 +462,16 @@
 
 		function confirmBuyWindow(){
 			const win = document.getElementById('finalCartItens');
-			const method = document.getElementById('paymentMethod').value;
-			const methodLabel = { card: 'Cartão (Rede)', pix: 'PIX', cash: 'Dinheiro' }[method];
 
 			win.innerHTML = cart.map((item, idx) => `
 				<div class="cart-itens-confirm">
 					<div class="itens-list">
 						<p><b>${item.name} X${item.qty}</b></p>
-						<p style="margin-left: 105px;"><span>R$${(item.price * item.qty).toFixed(2)}</span></p>
+						<p style="text-align: right;"><span>R$${(item.price * item.qty).toFixed(2)}</span></p>
 						<button class="btn-X" onclick="removeFromCart(${idx})"><b>×</b></button>
 					</div>
-					<p>Métod de pagamento ${methodLabel}</p>
-				</div>
+					
+				</div><br>
 			`).join('');
 
 			updateTotal();
@@ -505,6 +503,8 @@
 			const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
 			const discount = parseFloat(document.getElementById('discount').value) || 0;
 			const total = Math.max(0, subtotal - discount);
+
+			document.getElementById('totalConfirm').textContent = total.toFixed(2);
 
 			document.getElementById('subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
 			document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
@@ -740,7 +740,7 @@
 		// Inicializar quando DOM estiver pronto
 		console.log('Iniciando sistema...');
 		console.log('Verificando views:');
-		['dashboard', 'pdv', 'tabacaria', 'inventory', 'reports', 'settings'].forEach(viewId => {
+		['dashboard', 'cardapio', 'pdv', 'tabacaria', 'inventory', 'reports', 'settings'].forEach(viewId => {
 			const view = document.getElementById(viewId);
 			console.log(`  - View ${viewId}:`, view ? 'OK ✓' : 'FALTANDO ✗');
 		});
@@ -752,6 +752,51 @@
 		renderTabacaria();
 		updateInventoryTable();
 		refreshInventoryMachineOverview(false);
+
+		document.querySelectorAll('.options .topicos div').forEach(div =>{
+			div.addEventListener(
+				'click', () => {
+					const topicName = div.dataset.view;
+					console.log(topicName);
+
+					const actualPage = document.getElementById(topicName)
+
+					if(!actualPage) return;
+
+					document.querySelectorAll('.cardapio').forEach(el => el.classList.remove('on'));
+					actualPage.classList.add('on')
+
+					const homeTopicos = document.getElementById('topicos');
+
+					if(topicName === 'Voltar'){
+						document.querySelectorAll('.cardapio')
+							.forEach(el => el.classList.remove('on'));
+
+						homeTopicos.classList.add('on');
+					}
+
+					console.log("Clicou em:", topicName);
+			});
+		});
+
+		['topicos' , 'lanches'].forEach(viewId => {
+			const view = document.getElementById(viewId);
+			console.log(`  - View ${viewId}:`, view ? 'OK ✓' : 'FALTANDO ✗');
+		});
+
+		// cria as apginas com os itens do cardápio
+		fetch("Cardapio.html")
+		.then(response => response.text())
+		.then(data =>
+		{
+			const cart = document.querySelectorAll(".lanches");
+				cart.forEach(cart =>
+				{
+						cart.innerHTML = data;
+				}
+				);
+		}
+		);
 		
 		// Tentar carregar dados de analytics (se servidor estiver rodando)
 		setTimeout(() => loadAnalyticsData(), 500);

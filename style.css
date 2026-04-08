@@ -180,6 +180,15 @@
 			display: block;
 		}
 
+		.cardapio{
+			display: none;
+			animation: fadeIn 0.4s ease;
+		}
+
+		.cardapio.on{
+			display: block;
+		}
+
 		.topbar {
 			display: flex;
 			justify-content: space-between;
@@ -207,6 +216,16 @@
 			color: var(--texto-sec);
 			font-size: 13px;
 			font-weight: 500;
+		}
+
+		.meta .icon{
+			width: 100px;
+			transition: all 0.2s;
+			cursor: pointer;
+		}
+
+		.meta .icon:hover{
+			fill: var(--amarelo-escuro);
 		}
 
 		h1 {
@@ -628,7 +647,7 @@
 			transform: translate(-50%,-50%);
 		}
 
-		.confirm-cart-section button{
+		.confirm-cart-section button.X{
 			background-color: rgba(0, 0, 0, 0);
 			border: none;
 			cursor: pointer;
@@ -638,16 +657,44 @@
 			color: var(--amarelo);
 		}
 
-		.cart-window .cart-list .itens-list p{
-			color: var(--texto);
-			display: inline;
+		.cart-window .cart-list .itens-list{
+			background: #333333;
+			border-radius: 6px;
+			padding: 5px 6px;
+			display: grid;
+			grid-template-columns: 1fr auto auto;
+			gap: 10px;
+			align-items: center;
 			font-size: 16px;
 			font-style: bold;
+		}
+
+		.itens-list{
+			background-color: #333333;
+			border-radius: 6px;
+			padding: 5px 6px;
 		}
 
 		.itens-list p span{
 			color: var(--amarelo);
 			font-style: bold;
+		}
+
+		p.price{
+			font-size: 20px;
+			color: var(--preto);
+			background: linear-gradient(to left,var(--amarelo-escuro), var(--amarelo-claro));
+			padding: 6px 5px;
+			border-radius: 6px;
+		}
+
+		p.paymantMet{
+			background-color: #132713;
+			border:1px solid #04790a;
+			border-radius: 6px;
+			color: #10b981;
+			padding: 5px 6px;
+			
 		}
 
 		.btn-X {
@@ -673,6 +720,19 @@
 		.btn-X:active {
 			position:relative;
 			top:1px;
+		}
+
+		.btnConfirm{
+			width: 50%;
+			padding: 6px;
+			background: var(--amarelo);
+			border: none;
+			border-radius: 8px;
+			color: #111;
+			font-weight: bold;
+			font-size: 15px;
+			cursor: pointer;
+			margin-top: 12px;
 		}
 
 		.input-field {
@@ -908,6 +968,64 @@
 			font-size: 12px;
 			color: var(--muted);
 			margin-top: 4px;
+		}
+
+		.topicos{
+			display: flex;
+		}
+
+		.topicos .card{
+			width: 25%;
+			margin: 5px;
+			cursor: pointer;
+		}
+
+		.card .icon{
+			fill: var(--muted);
+			transition: all 0.2s;
+			width: auto;
+		}
+
+		.card:hover .icon{
+			fill: var(--amarelo);
+		}
+
+		.listaItens{
+			display: flex;
+			flex-wrap: wrap;
+		}
+
+		.listaItens .lanche{
+			flex-grow: 1;
+			flex-basis: 500px;
+			padding: 15px;
+			background-color: var(--preto-card);
+			border: 2px solid var(--borda);
+			border-radius: 10px;
+			margin-left: 10px;
+			margin-bottom: 10px;
+			transition: all 0.2s;
+		}
+
+		.lanche:hover{
+			border: 2px solid var(--amarelo);
+			box-shadow: -4px 0 16px rgba(251, 191, 36, 0.2);
+			top: 5px;
+		}
+
+		.lanche img{
+			width: 25%;
+			border-radius: 6px;
+			border: 2px solid var(--amarelo-escuro);
+			margin-right: 15px;
+		}
+
+		.lanche p{
+			font-family: 25px;
+		}
+
+		.lanche .desc{
+			display: flex;
 		}
 
 		.theme-toggle {
