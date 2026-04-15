@@ -254,11 +254,18 @@
 		}
 
 		function addNewProduct() {
+			const unidade = document.getElementById('unidade')
+			const pack = document.getElementById('pack')
+			
+
+
 			const name = (document.getElementById('newProductName')?.value || '').trim();
 			const categoryRaw = document.getElementById('newProductCategory')?.value || 'ingredientes:paes';
 			const [category, type] = categoryRaw.split(':');
 			const price = Number(document.getElementById('newProductPrice')?.value || 0);
 			const stock = Number(document.getElementById('newProductStock')?.value || 0);
+			const packs = Number(document.getElementById('newPacktStock')?.value || 0);
+			const multprodcts = Number(document.getElementById('newProductStock2')?.value || 0);
 			const minStock = Number(document.getElementById('newProductMinStock')?.value || 0);
 			const barcode = (document.getElementById('newProductBarcode')?.value || '').trim();
 			const desc = (document.getElementById('newProductDesc')?.value || '').trim();
@@ -273,9 +280,23 @@
 				return;
 			}
 
-			if (!Number.isFinite(stock) || stock < 0) {
-				alert('Informe uma quantidade inicial valida.');
-				return;
+			if(unidade.checked){
+				if (!Number.isFinite(stock) || stock < 0) {
+					alert('Informe uma quantidade inicial valida.');
+					return;
+				}
+			}
+
+			if(pack.checked){
+				if(!Number.isFinite(packs) || packs < 0){
+					alert('Informe uma quantidade inicial valida.');
+					return;
+				}
+
+				if(!Number.isFinite(multprodcts) || multprodcts < 0){
+					alert('Informe uma quantidade inicial valida.');
+					return;
+				}
 			}
 
 			if (!Number.isFinite(minStock) || minStock < 0) {
@@ -291,13 +312,19 @@
 				desc: desc || 'Sem descricao',
 				barcode: finalBarcode,
 				stock,
+				packs,
 				minStock,
 				category,
 				type: type || ''
 			};
 
 			products.push(product);
-			stockData[product.id] = stock;
+			if(unidade.checked){
+				stockData[product.id] = stock;
+			}
+			if(pack.checked){
+				stockData[product.id] = multprodcts * packs;
+			}
 			populatePurchaseProductOptions();
 			renderProducts();
 			renderTabacaria();
@@ -306,6 +333,8 @@
 			document.getElementById('newProductName').value = '';
 			document.getElementById('newProductPrice').value = '';
 			document.getElementById('newProductStock').value = '';
+			document.getElementById('newPacktStock').value = '';
+			document.getElementById('newProductStock2').value = '';
 			document.getElementById('newProductMinStock').value = '';
 			document.getElementById('newProductBarcode').value = '';
 			document.getElementById('newProductDesc').value = '';
@@ -703,6 +732,23 @@
 					<td><span class="status-badge ${(stockData[p.id] || 0) <= (p.minStock || 0) ? 'status-warning' : 'status-ok'}">${(stockData[p.id] || 0) <= (p.minStock || 0) ? 'BAIXO' : 'OK'}</span></td>
 				</tr>
 			`).join('');
+		}
+
+		function verifyQTD(){
+			const unidade = document.getElementById('unidade')
+			const pack = document.getElementById('pack')
+
+			let textBox = document.getElementById('textBox')
+
+			if(unidade.checked){
+				console.log("selecionou unidade");
+				textBox.innerHTML = `<p><input type="number" id="newProductStock" placeholder="Ex: 12 unidades" min="0"></p>`;
+			}
+			else if(pack.checked){
+				console.log("selecionou pack");
+				textBox.innerHTML = `<input type="number" id="newProductStock2" placeholder="Quantidade de itens" min="0">
+				<br><br><input type="number" id="newPacktStock" placeholder="Quantidade de pacotes" min="0"> `;
+			}
 		}
 
 		// Navegação de abas

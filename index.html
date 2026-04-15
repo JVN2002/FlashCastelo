@@ -311,7 +311,15 @@
 					</div>
 					<div class="input-field">
 						<label>Quantidade Inicial</label>
-						<input type="number" id="newProductStock" placeholder="Ex: 12" min="0">
+						<form>
+							<input type="radio" id="unidade" name="fav_language" value="UNIDADE" onchange="verifyQTD()">
+							<label for="UNIDADE">Unidade</label><br>
+							<input type="radio" id="pack" name="fav_language" value="PACK" onchange="verifyQTD()">
+							<label for="PACK">Pack</label><br>
+						</form>
+						<div id="textBox">
+							
+						</div>
 					</div>
 					<div class="input-field">
 						<label>Estoque Mínimo</label>
