@@ -270,6 +270,9 @@
 			const barcode = (document.getElementById('newProductBarcode')?.value || '').trim();
 			const desc = (document.getElementById('newProductDesc')?.value || '').trim();
 
+			console.log("packs:", packs);
+			console.log("mult:", multprodcts);
+
 			if (!name) {
 				alert('Informe o nome do produto.');
 				return;
@@ -280,6 +283,10 @@
 				return;
 			}
 
+			if (!unidade.checked && !pack.checked){
+				alert("Selecione tipo: unidade ou pack");
+				return;
+			}
 			if(unidade.checked){
 				if (!Number.isFinite(stock) || stock < 0) {
 					alert('Informe uma quantidade inicial valida.');
@@ -288,12 +295,12 @@
 			}
 
 			if(pack.checked){
-				if(!Number.isFinite(packs) || packs < 0){
+				if(!Number.isFinite(packs) || packs <= 0){
 					alert('Informe uma quantidade inicial valida.');
 					return;
 				}
 
-				if(!Number.isFinite(multprodcts) || multprodcts < 0){
+				if(!Number.isFinite(multprodcts) || multprodcts <= 0){
 					alert('Informe uma quantidade inicial valida.');
 					return;
 				}
@@ -304,27 +311,50 @@
 				return;
 			}
 
+			
+
 			const finalBarcode = barcode || `FT-${String(Date.now()).slice(-8)}-${nextProductId}`;
-			const product = {
-				id: nextProductId++,
-				name,
-				price,
-				desc: desc || 'Sem descricao',
-				barcode: finalBarcode,
-				stock,
-				packs,
-				minStock,
-				category,
-				type: type || ''
-			};
+			
+			let product;
+
+			if(unidade.checked){
+				product = {
+					id: nextProductId++,
+					name,
+					price,
+					desc: desc || 'Sem descricao',
+					barcode: finalBarcode,
+					stock,
+					minStock,
+					category,
+					type: type || ''
+				};
+
+				stockData[product.id] = stock;
+
+			} 
+			else if(pack.checked){
+				const total = multprodcts * packs;
+
+				product = {
+					id: nextProductId++,
+					name,
+					price,
+					desc: desc || 'Sem descricao',
+					barcode: finalBarcode,
+					stock: total,
+					packs: packs || 1,
+					mult: multprodcts,
+					minStock,
+					category,
+					type: type || ''
+				};
+
+				stockData[product.id] = total;
+			}
 
 			products.push(product);
-			if(unidade.checked){
-				stockData[product.id] = stock;
-			}
-			if(pack.checked){
-				stockData[product.id] = multprodcts * packs;
-			}
+
 			populatePurchaseProductOptions();
 			renderProducts();
 			renderTabacaria();
@@ -339,7 +369,10 @@
 			document.getElementById('newProductBarcode').value = '';
 			document.getElementById('newProductDesc').value = '';
 
+			
 			alert(`Produto cadastrado: ${product.name}`);
+			
+			
 		}
 
 		function updateFinancialSummary() {
@@ -374,12 +407,20 @@
 				alert('Informe um custo unitário válido.');
 				return;
 			}
-
-			stockData[productId] = (stockData[productId] || 0) + quantity;
+			const product = products.find((p) => p.id === productId);
+			const packsProducts = products.filter(p => p.packs !== undefined);
+			if(packsProducts.length === 0) {
+				stockData[productId] = (stockData[productId] || 0) + quantity;
+			}
+			else
+			{
+				stockData[productId] = (stockData[productId] || 0) + (quantity * product.mult);
+			}
+			
 			totalPurchases += quantity * unitCost;
 			updateFinancialSummary();
 
-			const product = products.find((p) => p.id === productId);
+			
 			alert(`✓ Compra registrada: ${quantity}x ${product?.name || 'Produto'}\nCusto total: R$ ${(quantity * unitCost).toFixed(2)}${note ? `\nObs: ${note}` : ''}`);
 
 			document.getElementById('purchaseQtyInput').value = '';
