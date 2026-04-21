@@ -264,8 +264,8 @@
 			const [category, type] = categoryRaw.split(':');
 			const price = Number(document.getElementById('newProductPrice')?.value || 0);
 			const stock = Number(document.getElementById('newProductStock')?.value || 0);
-			const packs = Number(document.getElementById('newPacktStock')?.value || 0);
-			const multprodcts = Number(document.getElementById('newProductStock2')?.value || 0);
+			const packs = Number(document.getElementById('newPacktStock')?.value || 1);
+			const multprodcts = Number(document.getElementById('newProductStock2')?.value || 1);
 			const minStock = Number(document.getElementById('newProductMinStock')?.value || 0);
 			const barcode = (document.getElementById('newProductBarcode')?.value || '').trim();
 			const desc = (document.getElementById('newProductDesc')?.value || '').trim();
@@ -315,43 +315,32 @@
 
 			const finalBarcode = barcode || `FT-${String(Date.now()).slice(-8)}-${nextProductId}`;
 			
-			let product;
+			
+
+			let total;
 
 			if(unidade.checked){
-				product = {
-					id: nextProductId++,
-					name,
-					price,
-					desc: desc || 'Sem descricao',
-					barcode: finalBarcode,
-					stock,
-					minStock,
-					category,
-					type: type || ''
-				};
-
-				stockData[product.id] = stock;
-
-			} 
-			else if(pack.checked){
-				const total = multprodcts * packs;
-
-				product = {
-					id: nextProductId++,
-					name,
-					price,
-					desc: desc || 'Sem descricao',
-					barcode: finalBarcode,
-					stock: total,
-					packs: packs || 1,
-					mult: multprodcts,
-					minStock,
-					category,
-					type: type || ''
-				};
-
-				stockData[product.id] = total;
+				total = stock;
+			} else {
+				total = multprodcts * packs; 
 			}
+
+			const product = {
+				id: nextProductId++,
+				name,
+				price,
+				desc: desc || 'Sem descricao',
+				barcode: finalBarcode,
+				stock,
+				packs: packs || 1,
+				mult: unidade.checked ? 1:multprodcts,
+				minStock,
+				category,
+				type: type || ''
+			};
+
+			stockData[product.id] = total;
+			
 
 			products.push(product);
 
@@ -408,14 +397,9 @@
 				return;
 			}
 			const product = products.find((p) => p.id === productId);
-			const packsProducts = products.filter(p => p.packs !== undefined);
-			if(packsProducts.length === 0) {
-				stockData[productId] = (stockData[productId] || 0) + quantity;
-			}
-			else
-			{
-				stockData[productId] = (stockData[productId] || 0) + (quantity * product.mult);
-			}
+			
+			stockData[productId] = (stockData[productId] || 0) + (quantity * product.mult);
+			
 			
 			totalPurchases += quantity * unitCost;
 			updateFinancialSummary();
@@ -792,6 +776,20 @@
 			}
 		}
 
+		// cria as apginas com os itens do cardápio
+		fetch("Cardapio.html")
+		.then(response => response.text())
+		.then(data =>
+		{
+			const cart = document.querySelectorAll(".lanches");
+				cart.forEach(cart =>
+				{
+						cart.innerHTML = data;
+				}
+				);
+		}
+		);
+
 		// Navegação de abas
 		document.querySelectorAll('.menu button').forEach(btn => {
 			btn.addEventListener('click', () => {
@@ -832,6 +830,39 @@
 			console.log(`  - View ${viewId}:`, view ? 'OK ✓' : 'FALTANDO ✗');
 		});
 		
+		document.querySelector('.options').addEventListener('click', (e) => {
+			const div = e.target.closest('[data-view]');
+			if (!div) return;
+			
+
+			const topicName = div.dataset.view;
+			console.log("DATA:", topicName);
+			console.log("Clicou no ",topicName);
+
+			const homeTopicos = document.getElementById('topicos');
+
+			if(topicName === 'Voltar'){
+				document.querySelectorAll('.cardapio').forEach(el => el.classList.remove('on'));
+
+				homeTopicos.classList.add('on');
+				return;
+			}
+
+			const actualPage = document.getElementById(topicName);
+			console.log("Pagina: ",actualPage);
+			if(!actualPage) return;
+
+			
+			document.querySelectorAll('.cardapio').forEach(el => el.classList.remove('on'));
+
+			actualPage.classList.add('on');
+		})
+
+		['topicos' , 'lanches'].forEach(viewId => {
+			const view = document.getElementById(viewId);
+			console.log(`  - View ${viewId}:`, view ? 'OK ✓' : 'FALTANDO ✗');
+		});
+
 		initStock();
 		populatePurchaseProductOptions();
 		updateFinancialSummary();
@@ -840,50 +871,6 @@
 		updateInventoryTable();
 		refreshInventoryMachineOverview(false);
 
-		document.querySelectorAll('.options .topicos div').forEach(div =>{
-			div.addEventListener(
-				'click', () => {
-					const topicName = div.dataset.view;
-					console.log(topicName);
-
-					const actualPage = document.getElementById(topicName)
-
-					if(!actualPage) return;
-
-					document.querySelectorAll('.cardapio').forEach(el => el.classList.remove('on'));
-					actualPage.classList.add('on')
-
-					const homeTopicos = document.getElementById('topicos');
-
-					if(topicName === 'Voltar'){
-						document.querySelectorAll('.cardapio')
-							.forEach(el => el.classList.remove('on'));
-
-						homeTopicos.classList.add('on');
-					}
-
-					console.log("Clicou em:", topicName);
-			});
-		});
-
-		['topicos' , 'lanches'].forEach(viewId => {
-			const view = document.getElementById(viewId);
-			console.log(`  - View ${viewId}:`, view ? 'OK ✓' : 'FALTANDO ✗');
-		});
-
-		// cria as apginas com os itens do cardápio
-		fetch("Cardapio.html")
-		.then(response => response.text())
-		.then(data =>
-		{
-			const cart = document.querySelectorAll(".lanches");
-				cart.forEach(cart =>
-				{
-						cart.innerHTML = data;
-				}
-				);
-		}
-		);
 		
 		// Tentar carregar dados de analytics (se servidor estiver rodando)
 		setTimeout(() => loadAnalyticsData(), 500);
