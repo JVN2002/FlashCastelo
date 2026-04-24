@@ -1,0 +1,110 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║           IMAGENS NECESSÁRIAS - Flash Castelo PDV Demo                     ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+📁 LOCALIZAÇÃO: c:\dev\flashcastelo\ (Mesma pasta do index.html)
+
+🖼️  PRODUTOS INDIVIDUAIS:
+─────────────────────────────────────────────────────────────────────────────
+
+1. heineken.png
+   Descrição: Heineken Long Neck (330ml)
+   Preço: R$ 12,00
+   Tag: TOP
+   Dimensões recomendadas: 180x180px (quadrado, será cortado em círculo)
+
+2. redlabel.png
+   Descrição: Red Label 1L (Whisky Escocês)
+   Preço: R$ 95,00
+   Tag: Nenhuma
+   Dimensões recomendadas: 180x180px
+
+3. gintanqueray.png
+   Descrição: Gin Tanqueray (750ml)
+   Preço: R$ 110,00
+   Tag: Nenhuma
+   Dimensões recomendadas: 180x180px
+
+4. vodka.png
+   Descrição: Vodka Smirnoff (998ml)
+   Preço: R$ 35,00
+   Tag: Nenhuma
+   Dimensões recomendadas: 180x180px
+
+5. redbull.png
+   Descrição: Red Bull 250ml (Energético)
+   Preço: R$ 9,00
+   Tag: POPULAR
+   Dimensões recomendadas: 180x180px
+
+6. corona.png
+   Descrição: Corona 330ml (Cerveja Premium)
+   Preço: R$ 14,00
+   Tag: Nenhuma
+   Dimensões recomendadas: 180x180px
+
+7. agua.png
+   Descrição: Água Premium 500ml (Destilada)
+   Preço: R$ 5,00
+   Tag: Nenhuma
+   Dimensões recomendadas: 180x180px
+
+
+🎁 COMBOS/BUNDLES:
+─────────────────────────────────────────────────────────────────────────────
+
+8. copored.png ⭐ ESPECIAL
+   Descrição: Copo Red Label + Red Bull
+   Preço: R$ 35,00
+   Tag: COMBO
+   Nota: Este é um exemplo de combo que combina a garrafa de Red Label com Red Bull
+   Dimensões recomendadas: 180x180px
+
+
+🎯 BRANDING/LOGO:
+─────────────────────────────────────────────────────────────────────────────
+
+9. logo.jpg (JÁ EXISTE)
+   Descrição: Logo Flash Castelo
+   Dimensões: 120x120px (circular)
+   Nota: Já deve estar na pasta
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 DICAS:
+─────────────────────────────────────────────────────────────────────────────
+
+✓ Todas as imagens devem estar em FORMATO PNG (exceto logo.jpg)
+✓ Tamanho recomendado: 180x180 pixels (quadrado)
+✓ O sistema exibe em forma de CARD com imagem, nome, descrição e preço
+✓ Se uma imagem não existir, o sistema mostra um placeholder SVG com o nome
+
+✓ FALLBACK AUTOMÁTICO: Se a imagem não for encontrada, aparece um SVG 
+  cinzento mostrando os primeiros 6 caracteres do nome do produto
+
+✓ CLICÁVEL: Clicar na imagem do produto ADICIONA ao carrinho automaticamente
+
+✓ SUPORTA COMBOS: Você pode criar quantos combos quiser (ex: copored.png)
+  Basta adicionar elementos no array "products" do código JavaScript com:
+  image: 'nomedaimagem.png', tag: 'COMBO'
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+📝 PARA ADICIONAR NOVOS PRODUTOS:
+
+Abra index.html e procure por:
+
+    const products = [
+        { id: 1, name: 'Heineken...', price: 12.00, desc: '330ml', image: 'heineken.png', tag: 'TOP' },
+        ...
+    ];
+
+Adicione uma nova linha ao final do array:
+
+    { id: 9, name: 'Nova Bebida', price: XX.XX, desc: 'descrição', image: 'novabebida.png' },
+
+O sistema atualizará automaticamente o PDV com o novo produto!
+
+═══════════════════════════════════════════════════════════════════════════════

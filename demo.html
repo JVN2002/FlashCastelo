@@ -1,0 +1,2806 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Flash Castelo | Sistema PDV Integrado</title>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+	<style>
+		:root {
+			--preto: #0a0a0a;
+			--preto-sec: #0f0f0f;
+			--preto-card: #151515;
+			--preto-card-2: #1a1a1a;
+			--amarelo: #fbbf24;
+			--amarelo-escuro: #f59e0b;
+			--amarelo-claro: #fcd34d;
+			--texto: #ffffff;
+			--texto-sec: #d1d5db;
+			--muted: #9ca3af;
+			--borda: #262626;
+			--borda-hover: #404040;
+			--shadow: rgba(0, 0, 0, 0.5);
+		}
+
+		:root[data-theme="light"] {
+			--preto: #f3f4f6;
+			--preto-sec: #ffffff;
+			--preto-card: #ffffff;
+			--preto-card-2: #f9fafb;
+			--texto: #111827;
+			--texto-sec: #374151;
+			--muted: #6b7280;
+			--borda: #d1d5db;
+			--borda-hover: #9ca3af;
+			--shadow: rgba(17, 24, 39, 0.12);
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		@keyframes slideInRight {
+			from { 
+				opacity: 0;
+				transform: translateX(-20px);
+			}
+			to { 
+				opacity: 1;
+				transform: translateX(0);
+			}
+		}
+
+		@keyframes pulse {
+			0%, 100% { opacity: 1; }
+			50% { opacity: 0.7; }
+		}
+
+		body {
+			margin: 0;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: var(--preto);
+			color: var(--texto);
+			background-image: 
+				radial-gradient(circle at top right, rgba(251, 191, 36, 0.08) 0%, transparent 50%),
+				radial-gradient(circle at bottom left, rgba(251, 191, 36, 0.05) 0%, transparent 50%);
+			background-attachment: fixed;
+		}
+
+		.sidebar {
+			width: 250px;
+			height: 100vh;
+			background: linear-gradient(180deg, var(--preto-sec) 0%, var(--preto) 100%);
+			position: fixed;
+			padding: 24px 16px;
+			border-right: 1px solid var(--borda);
+			box-shadow: 4px 0 24px var(--shadow);
+			display: flex;
+			flex-direction: column;
+			overflow-y: auto;
+			z-index: 100;
+		}
+
+		.logo {
+			text-align: center;
+			margin-bottom: 28px;
+			animation: fadeIn 0.8s ease;
+		}
+
+		.logo img {
+			width: 120px;
+			height: 120px;
+			object-fit: cover;
+			border-radius: 999px;
+			border: 3px solid var(--amarelo);
+			box-shadow: 0 8px 32px rgba(251, 191, 36, 0.4), 0 0 60px rgba(251, 191, 36, 0.2);
+			transition: transform 0.3s ease;
+		}
+
+		.logo img:hover {
+			transform: scale(1.05);
+		}
+
+		.logo h2 {
+			margin: 12px 0 4px;
+			color: var(--amarelo);
+			font-size: 22px;
+			font-weight: 800;
+			text-shadow: 0 2px 12px rgba(251, 191, 36, 0.3);
+			letter-spacing: 0.5px;
+		}
+
+		.logo p {
+			margin: 0;
+			color: var(--texto-sec);
+			font-size: 13px;
+			font-weight: 500;
+		}
+
+		.menu {
+			display: flex;
+			flex-direction: column;
+			gap: 6px;
+			animation: slideInRight 0.6s ease 0.2s both;
+		}
+
+		.menu button {
+			width: 100%;
+			padding: 14px 16px;
+			background: var(--preto-card);
+			border: 1px solid var(--borda);
+			color: var(--texto-sec);
+			cursor: pointer;
+			border-radius: 10px;
+			font-size: 15px;
+			font-weight: 600;
+			text-align: left;
+			position: relative;
+			overflow: hidden;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.menu button::before {
+			content: '';
+			position: absolute;
+			left: 0;
+			top: 0;
+			height: 100%;
+			width: 0;
+			background: var(--amarelo);
+			transition: width 0.3s ease;
+		}
+
+		.menu button:hover {
+			background: linear-gradient(90deg, rgba(251, 191, 36, 0.15) 0%, var(--preto-card-2) 100%);
+			border-color: var(--borda-hover);
+			color: var(--amarelo);
+			transform: translateX(4px);
+			box-shadow: -4px 0 16px rgba(251, 191, 36, 0.2);
+		}
+
+		.menu button.active {
+			background: linear-gradient(135deg, var(--amarelo-escuro) 0%, var(--amarelo) 100%);
+			color: var(--preto);
+			border-color: var(--amarelo);
+			font-weight: 700;
+			box-shadow: 0 4px 20px rgba(251, 191, 36, 0.4);
+			transform: translateX(4px);
+		}
+
+		.main {
+			margin-left: 270px;
+			padding: 28px;
+			overflow-y: auto;
+			min-height: 100vh;
+		}
+
+		.view {
+			display: none;
+			animation: fadeIn 0.4s ease;
+		}
+
+		.view.active {
+			display: block;
+		}
+
+		.topbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 20px;
+			animation: fadeIn 0.5s ease;
+		}
+
+		.demo-badge {
+			display: inline-block;
+			padding: 6px 12px;
+			border-radius: 999px;
+			font-size: 11px;
+			font-weight: 700;
+			letter-spacing: 0.5px;
+			background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%);
+			color: var(--amarelo);
+			border: 1px solid rgba(251, 191, 36, 0.3);
+			margin-bottom: 10px;
+			text-transform: uppercase;
+		}
+
+		.meta {
+			color: var(--texto-sec);
+			font-size: 13px;
+			font-weight: 500;
+		}
+
+		h1 {
+			margin: 0;
+			color: var(--amarelo);
+			font-size: 28px;
+			font-weight: 800;
+			text-shadow: 0 2px 12px rgba(251, 191, 36, 0.3);
+		}
+
+		h2 {
+			color: var(--amarelo);
+			margin-top: 20px;
+			font-weight: 700;
+		}
+
+		.dashboard {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 14px;
+			margin-bottom: 28px;
+		}
+
+		.card {
+			background: linear-gradient(135deg, var(--preto-card) 0%, var(--preto-card-2) 100%);
+			padding: 18px;
+			border-radius: 12px;
+			border: 1px solid var(--borda);
+			position: relative;
+			overflow: hidden;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+		}
+
+		.card::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 3px;
+			background: linear-gradient(90deg, var(--amarelo-escuro) 0%, var(--amarelo) 50%, var(--amarelo-claro) 100%);
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.card:hover {
+			transform: translateY(-4px);
+			box-shadow: 0 8px 24px rgba(251, 191, 36, 0.2);
+			border-color: var(--borda-hover);
+		}
+
+		.card:hover::before {
+			opacity: 1;
+		}
+
+		.card::after {
+			content: "";
+			position: absolute;
+			right: -30px;
+			top: -30px;
+			width: 100px;
+			height: 100px;
+			border-radius: 999px;
+			background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+		}
+
+		.card h2 {
+			margin: 0;
+			font-size: 12px;
+			color: var(--muted);
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			z-index: 1;
+			position: relative;
+		}
+
+		.card span {
+			display: block;
+			font-size: 28px;
+			font-weight: 800;
+			margin-top: 8px;
+			color: var(--amarelo);
+			z-index: 1;
+			position: relative;
+		}
+
+		.kpi-trend {
+			font-size: 11px;
+			color: #10b981;
+			font-weight: 600;
+			margin-top: 4px;
+			z-index: 1;
+			position: relative;
+		}
+
+		.section-title {
+			margin: 0 0 14px;
+			font-size: 17px;
+			font-weight: 700;
+			color: var(--amarelo);
+			position: relative;
+			padding-bottom: 8px;
+		}
+
+		.section-title::after {
+			content: '';
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			width: 40px;
+			height: 2px;
+			background: var(--amarelo);
+			border-radius: 2px;
+		}
+
+		.grid-2 {
+			display: grid;
+			grid-template-columns: 2fr 1fr;
+			gap: 14px;
+			margin-bottom: 14px;
+		}
+
+		.panel {
+			background: linear-gradient(135deg, var(--preto-card) 0%, var(--preto-card-2) 100%);
+			border: 1px solid var(--borda);
+			border-radius: 12px;
+			padding: 16px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+			transition: all 0.3s ease;
+		}
+
+		.panel:hover {
+			border-color: var(--borda-hover);
+			box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+		}
+
+		.sales-bars {
+			display: grid;
+			gap: 12px;
+		}
+
+		.bar-row {
+			display: grid;
+			grid-template-columns: 110px 1fr 60px;
+			align-items: center;
+			gap: 10px;
+			font-size: 13px;
+			transition: all 0.2s ease;
+		}
+
+		.bar-row:hover {
+			transform: translateX(4px);
+		}
+
+		.bar {
+			height: 12px;
+			background: #1a1a1a;
+			border-radius: 999px;
+			overflow: hidden;
+			box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+		}
+
+		.bar span {
+			display: block;
+			height: 100%;
+			background: linear-gradient(90deg, var(--amarelo-escuro) 0%, var(--amarelo) 100%);
+			border-radius: 999px;
+			box-shadow: 0 0 8px rgba(251, 191, 36, 0.4);
+			transition: width 0.3s ease;
+		}
+
+		.payment-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 8px;
+		}
+
+		.payment-item {
+			background: var(--preto-card-2);
+			border: 1px solid var(--borda);
+			border-radius: 8px;
+			padding: 10px;
+			text-align: center;
+		}
+
+		.payment-item strong {
+			display: block;
+			color: var(--amarelo);
+			font-size: 20px;
+			margin-top: 4px;
+		}
+
+		.alerts {
+			display: grid;
+			gap: 8px;
+		}
+
+		.alert {
+			padding: 10px;
+			border-radius: 8px;
+			background: #222;
+			border: 1px solid #3a3a3a;
+			font-size: 13px;
+		}
+
+		.alert strong {
+			color: var(--amarelo);
+		}
+
+		.products-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 14px;
+			margin-bottom: 20px;
+		}
+
+		.product-card {
+			background: linear-gradient(135deg, var(--preto-card) 0%, var(--preto-card-2) 100%);
+			border: 1px solid var(--borda);
+			border-radius: 12px;
+			overflow: hidden;
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			position: relative;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		}
+
+		.product-card::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			height: 3px;
+			background: linear-gradient(90deg, var(--amarelo-escuro) 0%, var(--amarelo) 100%);
+			transform: scaleX(0);
+			transition: transform 0.3s ease;
+		}
+
+		.product-card:hover {
+			border-color: var(--amarelo);
+			transform: translateY(-8px);
+			box-shadow: 0 12px 32px rgba(251, 191, 36, 0.25);
+		}
+
+		.product-card:hover::before {
+			transform: scaleX(1);
+		}
+
+		.product-image {
+			width: 100%;
+			height: 180px;
+			background: linear-gradient(135deg, #1a1a1a 0%, #252525 100%);
+			display: grid;
+			place-items: center;
+			font-size: 64px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.product-image::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background: radial-gradient(circle at center, transparent 40%, rgba(0, 0, 0, 0.4) 100%);
+		}
+
+		.product-image img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			transition: transform 0.3s ease;
+			z-index: 1;
+			position: relative;
+		}
+
+		.product-card:hover .product-image img {
+			transform: scale(1.1);
+		}
+
+		.product-info {
+			padding: 14px;
+			position: relative;
+};
+
+		.product-name {
+			font-size: 14px;
+			font-weight: 700;
+			margin: 0 0 6px;
+			color: var(--texto);
+			line-height: 1.3;
+		}
+
+		.product-price {
+			font-size: 18px;
+			font-weight: 800;
+			color: var(--amarelo);
+			margin: 6px 0;
+			text-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+		}
+
+		.product-desc {
+			font-size: 11px;
+			color: var(--muted);
+			margin: 4px 0;
+			font-weight: 500;
+		}
+
+		.product-tag {
+			position: absolute;
+			top: 10px;
+			right: 10px;
+			font-size: 10px;
+			padding: 5px 8px;
+			border-radius: 999px;
+			background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.1) 100%);
+			color: var(--amarelo);
+			border: 1px solid rgba(251, 191, 36, 0.3);
+			font-weight: 700;
+			letter-spacing: 0.5px;
+			text-transform: uppercase;
+			z-index: 2;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+		}
+
+		.btn-add {
+			width: 100%;
+			padding: 10px;
+			margin-top: 10px;
+			background: linear-gradient(135deg, var(--amarelo-escuro) 0%, var(--amarelo) 100%);
+			border: none;
+			border-radius: 8px;
+			color: var(--preto);
+			font-weight: 700;
+			cursor: pointer;
+			font-size: 13px;
+			text-transform: uppercase;
+			letter-spacing: 0.3px;
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 12px rgba(251, 191, 36, 0.3);
+		}
+
+		.btn-add:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 6px 20px rgba(251, 191, 36, 0.5);
+			background: linear-gradient(135deg, var(--amarelo) 0%, var(--amarelo-claro) 100%);
+		}
+
+		.btn-add:active {
+			transform: translateY(0);
+		}
+
+		.cart-section {
+			background: linear-gradient(135deg, var(--preto-card) 0%, var(--preto-card-2) 100%);
+			border: 1px solid var(--borda);
+			border-radius: 12px;
+			padding: 16px;
+			position: sticky;
+			top: 20px;
+			box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+		}
+
+		.cart-items {
+			display: grid;
+			gap: 10px;
+			max-height: 400px;
+			overflow-y: auto;
+			margin-bottom: 14px;
+		}
+
+		.cart-item {
+			background: var(--preto-card-2);
+			border: 1px solid var(--borda);
+			border-radius: 8px;
+			padding: 10px;
+			display: grid;
+			grid-template-columns: 1fr auto auto;
+			gap: 10px;
+			align-items: center;
+			font-size: 12px;
+			transition: all 0.2s ease;
+		}
+
+		.cart-item:hover {
+			border-color: var(--borda-hover);
+			transform: translateX(-4px);
+		}
+
+		.cart-item-name {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			font-weight: 600;
+		}
+
+		.cart-summary {
+			padding: 12px;
+			background: #1a1a1a;
+			border-radius: 8px;
+			margin-bottom: 14px;
+			border: 1px solid var(--borda);
+		}
+
+		.cart-line {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 10px;
+			font-size: 13px;
+			margin-bottom: 6px;
+			font-weight: 500;
+		}
+
+		.cart-total {
+			font-size: 20px;
+			font-weight: 800;
+			color: var(--amarelo);
+			border-top: 2px solid var(--borda);
+			padding-top: 10px;
+			text-align: right;
+			text-shadow: 0 2px 8px rgba(251, 191, 36, 0.3);
+		}
+
+		.input-field {
+			display: grid;
+			gap: 4px;
+			margin-bottom: 10px;
+		}
+
+		.input-field label {
+			font-size: 12px;
+			color: var(--muted);
+			font-weight: bold;
+		}
+
+		.input-field input,
+		.input-field select,
+		.input-field textarea {
+			background: #202020;
+			border: 1px solid var(--borda);
+			border-radius: 8px;
+			padding: 8px;
+			color: var(--texto);
+			font-size: 13px;
+		}
+
+		.btn-secondary {
+			padding: 10px;
+			background: #202020;
+			border: 1px solid var(--borda);
+			border-radius: 6px;
+			color: var(--texto);
+			cursor: pointer;
+			font-size: 13px;
+		}
+
+		.btn-secondary:hover {
+			background: #282828;
+		}
+
+		.drink-tab.active {
+			background: var(--amarelo);
+			color: #111;
+			font-weight: bold;
+		}
+
+		.btn-pay {
+			width: 100%;
+			padding: 14px;
+			background: var(--amarelo);
+			border: none;
+			border-radius: 8px;
+			color: #111;
+			font-weight: bold;
+			font-size: 15px;
+			cursor: pointer;
+			margin-top: 12px;
+		}
+
+		.btn-pay:hover {
+			background: var(--amarelo-escuro);
+		}
+
+		.table-simple {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 13px;
+		}
+
+		.table-simple th {
+			text-align: left;
+			padding: 8px;
+			border-bottom: 1px solid var(--borda);
+			color: var(--muted);
+			font-weight: normal;
+		}
+
+		.table-simple td {
+			padding: 8px;
+			border-bottom: 1px solid var(--borda);
+		}
+
+		.status-badge {
+			display: inline-block;
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-size: 11px;
+			font-weight: bold;
+		}
+
+		.status-ok {
+			background: #1a3a1a;
+			color: #8ae08a;
+		}
+
+		.status-warning {
+			background: #3a3a1a;
+			color: var(--amarelo);
+		}
+
+		.modal-overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0,0,0,0.8);
+			z-index: 999;
+			place-items: center;
+		}
+
+		.modal-overlay.active {
+			display: grid;
+		}
+
+		.modal {
+			background: var(--preto-card);
+			border: 1px solid var(--borda);
+			border-radius: 10px;
+			padding: 20px;
+			width: min(520px, 90vw);
+			max-height: 90vh;
+			overflow-y: auto;
+		}
+
+		.modal h3 {
+			margin-top: 0;
+			color: var(--amarelo);
+		}
+
+		.integration-box {
+			background: var(--preto-card-2);
+			border: 1px solid #4a3a0c;
+			border-radius: 10px;
+			padding: 14px;
+			margin-top: 12px;
+		}
+
+		.integration-box h4 {
+			margin: 0 0 8px;
+			color: var(--amarelo);
+			font-size: 14px;
+		}
+
+		.sidebar-footer {
+			margin-top: auto;
+			font-size: 12px;
+			color: var(--muted);
+			padding-top: 16px;
+		}
+
+		@keyframes pulse {
+			0%, 100% { opacity: 1; }
+			50% { opacity: 0.6; }
+		}
+
+		.chart-container {
+			background: linear-gradient(135deg, var(--preto-card) 0%, var(--preto-card-2) 100%);
+			border: 1px solid var(--borda);
+			border-radius: 12px;
+			padding: 20px;
+			margin-bottom: 20px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+		}
+
+		.chart-wrapper {
+			position: relative;
+			height: 300px;
+			margin-top: 10px;
+		}
+
+		.search-container {
+			position: relative;
+			margin-bottom: 20px;
+		}
+
+		.search-input {
+			width: 100%;
+			padding: 12px 16px 12px 40px;
+			background: #202020;
+			border: 1px solid var(--borda);
+			border-radius: 8px;
+			color: var(--texto);
+			font-size: 14px;
+		}
+
+		.search-icon {
+			position: absolute;
+			left: 12px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: var(--muted);
+			pointer-events: none;
+		}
+
+		.search-results {
+			position: absolute;
+			top: 100%;
+			left: 0;
+			right: 0;
+			background: var(--preto-card);
+			border: 1px solid var(--borda);
+			border-top: none;
+			border-radius: 0 0 8px 8px;
+			max-height: 300px;
+			overflow-y: auto;
+			z-index: 10;
+			display: none;
+		}
+
+		.search-results.show {
+			display: block;
+		}
+
+		.search-result-item {
+			padding: 12px 16px;
+			border-bottom: 1px solid var(--borda);
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+
+		.search-result-item:hover {
+			background: var(--preto-card-2);
+		}
+
+		.search-result-name {
+			font-weight: 600;
+			font-size: 14px;
+			color: var(--texto);
+		}
+
+		.search-result-price {
+			font-size: 12px;
+			color: var(--muted);
+			margin-top: 4px;
+		}
+
+		.theme-toggle {
+			padding: 8px 12px;
+			background: var(--preto-card);
+			border: 1px solid var(--borda);
+			border-radius: 8px;
+			color: var(--texto);
+			cursor: pointer;
+			font-size: 12px;
+			transition: all 0.2s;
+			margin-top: 12px;
+			width: 100%;
+			text-align: center;
+		}
+
+		.theme-toggle:hover {
+			border-color: var(--amarelo);
+			color: var(--amarelo);
+		}
+
+		@media (max-width: 1400px) {
+			.products-grid {
+				grid-template-columns: repeat(3, 1fr);
+			}
+		}
+
+		@media (max-width: 1000px) {
+			.products-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+
+			.dashboard {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+
+		@media (max-width: 900px) {
+			.sidebar {
+				position: static;
+				width: 100%;
+				height: auto;
+				max-height: 100px;
+			}
+
+			.main {
+				margin-left: 0;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="sidebar">
+		<div class="logo">
+			<img src="logo.jpg" alt="Logo Flash Castelo">
+			<h2>Flash Castelo</h2>
+			<p>Adega e Tabacaria</p>
+		</div>
+
+		<div class="menu">
+			<button class="active" data-view="dashboard">Dashboard</button>
+			<button data-view="pdv">Bebidas</button>
+			<button data-view="tabacaria">Tabacaria</button>
+			<button data-view="inventory">Estoque</button>
+			<button data-view="reports">Relatórios</button>
+			<button data-view="analytics">Análises</button>
+			<button data-view="settings">Configurações</button>
+		</div>
+
+		<button class="theme-toggle" onclick="toggleTheme()">Ativar modo claro</button>
+
+		<div class="sidebar-footer">
+			Sistema de Gestão para Adega<br>
+			Demonstração Comercial 2026
+		</div>
+	</div>
+
+	<div class="main">
+		<!-- ========== DASHBOARD ========== -->
+		<div id="dashboard" class="view active">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Painel Estratégico da Adega</h1>
+				</div>
+				<div class="meta">Hoje, 04 Mar 2026 • Turno Noite • Caixa #03</div>
+			</div>
+
+			<div class="dashboard">
+				<div class="card">
+					<h2>Vendas Hoje</h2>
+					<span>R$ 680</span>
+					<div class="kpi-trend">▲ 12% vs ontem</div>
+				</div>
+				<div class="card">
+					<h2>Itens Vendidos</h2>
+					<span>28</span>
+					<div class="kpi-trend">▲ Pico 21h–22h</div>
+				</div>
+				<div class="card">
+					<h2>Ticket Médio</h2>
+					<span>R$ 45,50</span>
+					<div class="kpi-trend">▲ 5% vs semana</div>
+				</div>
+				<div class="card">
+					<h2>Lucro Líquido</h2>
+					<span>R$ 245</span>
+					<div class="kpi-trend">▲ Margem 36%</div>
+				</div>
+				<div class="card">
+					<h2>Estoque Crítico</h2>
+					<span>3</span>
+					<div class="kpi-trend">⚠️ Ação necessária</div>
+				</div>
+				<div class="card">
+					<h2>Itens em Estoque</h2>
+					<span>580</span>
+					<div class="kpi-trend">↓ 8% vs semana</div>
+				</div>
+				<div class="card">
+					<h2>Tempo de Caixa</h2>
+					<span>6h 45min</span>
+					<div class="kpi-trend">⏱️ Operacional</div>
+				</div>
+				<div class="card">
+					<h2>Clientes Hoje</h2>
+					<span>48</span>
+					<div class="kpi-trend">▲ 15% vs ontem</div>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">Desempenho por Categoria</h3>
+					<div class="sales-bars">
+						<div class="bar-row">
+							<div>Cervejas</div>
+							<div class="bar"><span style="width: 80%"></span></div>
+							<div>R$ 320</div>
+						</div>
+						<div class="bar-row">
+							<div>Destilados</div>
+							<div class="bar"><span style="width: 60%"></span></div>
+							<div>R$ 240</div>
+						</div>
+						<div class="bar-row">
+							<div>Combos</div>
+							<div class="bar"><span style="width: 24%"></span></div>
+							<div>R$ 78</div>
+						</div>
+						<div class="bar-row">
+							<div>Energéticos</div>
+							<div class="bar"><span style="width: 10%"></span></div>
+							<div>R$ 32</div>
+						</div>
+						<div class="bar-row">
+							<div>Tabacaria</div>
+							<div class="bar"><span style="width: 3%"></span></div>
+							<div>R$ 10</div>
+						</div>
+					</div>
+
+					<h3 class="section-title" style="margin-top: 16px;">Produtos Destaque</h3>
+					<div style="font-size: 12px; line-height: 1.8;">
+						<div style="color: var(--amarelo); margin-bottom: 4px;">🥇 Heineken 600ml — 9 un</div>
+						<div style="color: var(--amarelo); margin-bottom: 4px;">🥈 Corona 330ml — 7 un</div>
+						<div style="color: var(--amarelo);">🥉 Red Label 1L — 3 un</div>
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Mix de Pagamento</h3>
+					<div class="payment-grid">
+						<div class="payment-item">
+							PIX
+							<strong>42%</strong>
+						</div>
+						<div class="payment-item">
+							Cartão
+							<strong>38%</strong>
+						</div>
+						<div class="payment-item">
+							Dinheiro
+							<strong>20%</strong>
+						</div>
+					</div>
+
+					<h3 class="section-title" style="margin-top: 14px;">Alertas Críticos</h3>
+					<div class="alerts">
+						<div class="alert"><strong>⚠️ Estoque baixo:</strong> Seagers Gin (2 un)</div>
+						<div class="alert"><strong>⚠️ Ruptura prevista:</strong> Beefeter em 1 dia</div>
+						<div class="alert"><strong>✓ Meta diária:</strong> 85% atingida</div>
+						<div class="alert"><strong>📊 Melhor horário:</strong> 21h-23h (R$ 896)</div>
+					</div>
+
+					<h3 class="section-title" style="margin-top: 14px;">Reposição de Ingredientes</h3>
+					<div style="font-size: 11px; line-height: 1.8; background: #1a2414; padding: 8px; border-radius: 6px;">
+						<div style="margin-bottom: 6px;"><strong style="color: #fbbf24;">🧊 Ingredientes Necessários:</strong></div>
+						<div style="font-size: 10px; color: #8ae08a; margin-left: 12px;">
+							• Heineken 600ml (repor 2 caixas)<br>
+							• Baly 2L (repor 1 caixa)<br>
+							• Vibe 2L (repor 1 garrafa)
+						</div>
+						<div style="margin-top: 6px; margin-bottom: 6px;"><strong style="color: #fbbf24;">📦 Estoque OK:</strong></div>
+						<div style="font-size: 10px; color: #8ae08a; margin-left: 12px;">
+							• Corona 330ml<br>
+							• Red Label 1L<br>
+							• Vodka Smirnoff
+						</div>
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Performance do Dia</h3>
+					<div style="font-size: 11px; line-height: 1.8;">
+						<div style="background: #1a2a1a; padding: 8px; border-radius: 6px; margin-bottom: 8px;">
+							<div><strong style="color: #8ae08a;">▲ Maior venda:</strong> 21:30 (R$ 65)</div>
+							<div><strong style="color: #8ae08a;">📦 Maior saída:</strong> Heineken (4 un)</div>
+							<div><strong style="color: #fbbf24;">💰 Faturamento/hora:</strong> R$ 101</div>
+							<div><strong style="color: #fbbf24;">⏱️ Tempo médio:</strong> 3min 40s/venda</div>
+						</div>
+					</div>
+
+					<h3 class="section-title">Estoque Crítico Detalhado</h3>
+					<table class="table-simple" style="font-size: 10px;">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Qtd</th>
+								<th>Mín</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td style="color: #f59e0b;"><strong>Seagers Gin</strong></td>
+								<td>2</td>
+								<td>10</td>
+							</tr>
+							<tr>
+								<td style="color: #f59e0b;"><strong>Beefeter Gin</strong></td>
+								<td>4</td>
+								<td>8</td>
+							</tr>
+							<tr>
+								<td style="color: #fbbf24;"><strong>Jack Fire</strong></td>
+								<td>7</td>
+								<td>10</td>
+							</tr>
+							<tr>
+								<td style="color: #fbbf24;"><strong>Vibe 2L</strong></td>
+								<td>8</td>
+								<td>20</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== PDV ========== -->
+		<div id="pdv" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Bebidas — Seleção de Produtos para Venda</h1>
+				</div>
+				<div class="meta">Integrado com SDK Rede (Laranjinha Smart)</div>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 320px; gap: 14px;">
+				<div>
+					<h2>Produtos & Combos</h2>
+					<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;">
+						<button class="btn-secondary drink-tab active" data-type="cerveja" onclick="filterByType('cerveja'); renderProducts();">Cervejas</button>
+						<button class="btn-secondary drink-tab" data-type="destilado" onclick="filterByType('destilado'); renderProducts();">Destilados</button>
+						<button class="btn-secondary drink-tab" data-type="nao_alcoolico" onclick="filterByType('nao_alcoolico'); renderProducts();">Não Alcoólicos</button>
+						<button class="btn-secondary drink-tab" data-type="combo" onclick="filterByType('combo'); renderProducts();">Combos</button>
+					</div>
+					<div class="products-grid" id="productsGrid"></div>
+				</div>
+
+				<div class="cart-section">
+					<h3 style="margin-top: 0; color: var(--amarelo);">Carrinho</h3>
+					<div id="cartItems" class="cart-items">
+						<span style="color: var(--muted); text-align: center; font-size: 12px;">Vazio</span>
+					</div>
+
+					<div class="cart-summary">
+						<div class="cart-line">
+							<div>Subtotal:</div>
+							<div style="text-align: right;" id="subtotal">R$ 0,00</div>
+						</div>
+						<div class="cart-line">
+							<div>Desconto:</div>
+							<div style="text-align: right;">
+								<input type="number" id="discount" value="0" step="0.01" onchange="updateTotal()" style="width: 70px;">
+							</div>
+						</div>
+						<div class="cart-total">
+							<div id="total">R$ 0,00</div>
+						</div>
+					</div>
+
+					<div style="padding: 12px; background: #1a2414; border: 1px solid #3a4a3a; border-radius: 8px; margin-bottom: 12px;">
+						<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">💳 Pagamento</h4>
+						<select id="paymentMethod" style="width: 100%; margin-bottom: 8px;">
+							<option value="card">Cartão (Rede)</option>
+							<option value="pix">PIX</option>
+							<option value="cash">Dinheiro</option>
+						</select>
+						<div style="padding: 8px; background: #0f1a0f; border-radius: 4px; margin-top: 8px; font-size: 11px; color: #8ae08a;">
+							<strong>Status Rede:</strong> Conectado ✓<br>
+							<strong>POS:</strong> POS-001 (Laranjinha Smart)<br>
+						</div>
+					</div>
+
+					<button class="btn-pay" onclick="finalizePay()">Processar Pagamento</button>
+					<button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="clearCart()">Limpar</button>
+				</div>
+			</div>
+		</div>
+
+		<!--========== TABACARIA ========== -->
+		<div id="tabacaria" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Tabacaria — Essências e Acessórios</h1>
+				</div>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 320px; gap: 14px;">
+				<div>
+					<h2>Produtos de Tabacaria</h2>
+					<div class="products-grid" id="tabacariGrid"></div>
+				</div>
+
+				<div class="cart-section">
+					<h3 style="margin-top: 0; color: var(--amarelo);">Carrinho</h3>
+					<div id="cartItems" class="cart-items">
+						<span style="color: var(--muted); text-align: center; font-size: 12px;">Vazio</span>
+					</div>
+
+					<div class="cart-summary">
+						<div class="cart-line">
+							<div>Subtotal:</div>
+							<div style="text-align: right;" id="subtotal">R$ 0,00</div>
+						</div>
+						<div class="cart-line">
+							<div>Desconto:</div>
+							<div style="text-align: right;">
+								<input type="number" id="discount" value="0" step="0.01" onchange="updateTotal()" style="width: 70px;">
+							</div>
+						</div>
+						<div class="cart-total">
+							<div id="total">R$ 0,00</div>
+						</div>
+					</div>
+
+					<div style="padding: 12px; background: #1a2414; border: 1px solid #3a4a3a; border-radius: 8px; margin-bottom: 12px;">
+						<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">💳 Pagamento</h4>
+						<select id="paymentMethod" style="width: 100%; margin-bottom: 8px;">
+							<option value="card">Cartão (Rede)</option>
+							<option value="pix">PIX</option>
+							<option value="cash">Dinheiro</option>
+						</select>
+						<div style="padding: 8px; background: #0f1a0f; border-radius: 4px; margin-top: 8px; font-size: 11px; color: #8ae08a;">
+							<strong>Status Rede:</strong> Conectado ✓<br>
+							<strong>POS:</strong> POS-001 (Laranjinha Smart)<br>
+						</div>
+					</div>
+
+					<button class="btn-pay" onclick="finalizePay()">Processar Pagamento</button>
+					<button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="clearCart()">Limpar</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== INVENTORY ========== -->
+		<div id="inventory" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Gestão de Estoque</h1>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">📝 Cadastrar Novo Produto</h3>
+					<div class="input-field">
+						<label>Nome do Produto</label>
+						<input type="text" placeholder="Ex: Cerveja Luna 350ml">
+					</div>
+					<div class="input-field">
+						<label>Categoria</label>
+						<select>
+							<option>Bebida - Cerveja</option>
+							<option>Bebida - Destilado</option>
+							<option>Bebida - Não Alcoólico</option>
+							<option>Tabacaria - Essência</option>
+							<option>Tabacaria - Acessório</option>
+							<option>Outro</option>
+						</select>
+					</div>
+					<div class="input-field">
+						<label>Preço (R$)</label>
+						<input type="number" placeholder="Ex: 24.90" step="0.01">
+					</div>
+					<div class="input-field">
+						<label>Quantidade Inicial</label>
+						<input type="number" placeholder="Ex: 12">
+					</div>
+					<div class="input-field">
+						<label>Código de Barras (opcional)</label>
+						<input type="text" placeholder="Ex: 7891119NOVO01">
+					</div>
+					<button class="btn-secondary" style="width: 100%; background: linear-gradient(135deg, #8ae08a 0%, #4ade80 100%); color: #0a0a0a; font-weight: bold;">✓ Adicionar ao PDV</button>
+					<div style="font-size: 10px; color: #888; margin-top: 8px; text-align: center;">
+						✓ Produto aparecerá automaticamente na lista de vendas
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Entrada de Estoque</h3>
+					<div class="input-field">
+						<label>Produto</label>
+						<select id="purchaseProductSelect">
+						</select>
+					</div>
+					<div class="input-field">
+						<label>Quantidade</label>
+						<input type="number" id="purchaseQtyInput" placeholder="Ex: 24" min="1">
+					</div>
+					<div class="input-field">
+						<label>Custo Unitário (R$)</label>
+						<input type="number" id="purchaseUnitCostInput" placeholder="Ex: 8.50" step="0.01" min="0">
+					</div>
+					<div class="input-field">
+						<label>Observação</label>
+						<input type="text" id="purchaseNoteInput" placeholder="Fornecedor, lote, etc...">
+					</div>
+					<button class="btn-secondary" style="width: 100%;" onclick="registerPurchase()">Registrar Compra</button>
+
+					<div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--borda); display: grid; gap: 8px;">
+						<div style="font-size: 12px; color: var(--muted);">Resumo Financeiro</div>
+						<div style="display: flex; justify-content: space-between; font-size: 13px;">
+							<div>🧾 Compras acumuladas:</div>
+							<div id="totalPurchasesValue" style="color: #f59e0b; font-weight: bold;">R$ 0,00</div>
+						</div>
+						<div style="display: flex; justify-content: space-between; font-size: 13px;">
+							<div>💰 Vendas acumuladas:</div>
+							<div id="totalSalesValue" style="color: #8ae08a; font-weight: bold;">R$ 0,00</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">Produtos em Estoque</h3>
+					<table id="inventoryTable" class="table-simple">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Qtd</th>
+								<th>Mín</th>
+								<th>Status</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><strong>Heineken Long Neck</strong></td>
+								<td>80</td>
+								<td>20</td>
+								<td><span class="status-badge status-ok">OK</span></td>
+							</tr>
+							<tr>
+								<td><strong>Red Label 1L</strong></td>
+								<td>25</td>
+								<td>15</td>
+								<td><span class="status-badge status-ok">OK</span></td>
+							</tr>
+							<tr>
+								<td><strong>Gin Tanqueray</strong></td>
+								<td>3</td>
+								<td>10</td>
+								<td><span class="status-badge status-warning">BAIXO</span></td>
+							</tr>
+							<tr>
+								<td><strong>Vodka Smirnoff</strong></td>
+								<td>40</td>
+								<td>20</td>
+								<td><span class="status-badge status-ok">OK</span></td>
+							</tr>
+							<tr>
+								<td><strong>Red Bull 250ml</strong></td>
+								<td>120</td>
+								<td>50</td>
+								<td><span class="status-badge status-ok">OK</span></td>
+							</tr>
+							<tr>
+								<td><strong>Corona 330ml</strong></td>
+								<td>50</td>
+								<td>25</td>
+								<td><span class="status-badge status-ok">OK</span></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== REPORTS ========== -->
+		<div id="reports" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Relatórios e Análises Avançadas</h1>
+				</div>
+				<div class="meta">Período: últimos 7 dias | Atualizado: há 2 minutos</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">Vendas por Dia</h3>
+					<div class="sales-bars">
+						<div class="bar-row">
+							<div>Seg</div>
+							<div class="bar"><span style="width: 65%"></span></div>
+							<div>R$ 1.840</div>
+						</div>
+						<div class="bar-row">
+							<div>Ter</div>
+							<div class="bar"><span style="width: 72%"></span></div>
+							<div>R$ 2.020</div>
+						</div>
+						<div class="bar-row">
+							<div>Qua</div>
+							<div class="bar"><span style="width: 78%"></span></div>
+							<div>R$ 2.180</div>
+						</div>
+						<div class="bar-row">
+							<div>Qui</div>
+							<div class="bar"><span style="width: 85%"></span></div>
+							<div>R$ 2.340</div>
+						</div>
+						<div class="bar-row">
+							<div>Sex</div>
+							<div class="bar"><span style="width: 92%"></span></div>
+							<div>R$ 2.580</div>
+						</div>
+						<div class="bar-row">
+							<div>Sáb</div>
+							<div class="bar"><span style="width: 100%"></span></div>
+							<div>R$ 2.820</div>
+						</div>
+						<div class="bar-row">
+							<div>Dom</div>
+							<div class="bar"><span style="width: 88%"></span></div>
+							<div>R$ 2.450</div>
+						</div>
+					</div>
+
+					<h3 class="section-title" style="margin-top: 16px;">Vendas por Categoria (últimos 7 dias)</h3>
+					<table class="table-simple">
+						<thead>
+							<tr>
+								<th>Categoria</th>
+								<th>Qtd</th>
+								<th>Faturamento</th>
+								<th>%</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><strong>Cervejas</strong></td>
+								<td>324</td>
+								<td>R$ 4.680</td>
+								<td style="color: var(--amarelo);">45%</td>
+							</tr>
+							<tr>
+								<td><strong>Destilados</strong></td>
+								<td>76</td>
+								<td>R$ 4.920</td>
+								<td style="color: var(--amarelo);">38%</td>
+							</tr>
+							<tr>
+								<td><strong>Combos</strong></td>
+								<td>48</td>
+								<td>R$ 1.340</td>
+								<td style="color: var(--amarelo);">10%</td>
+							</tr>
+							<tr>
+								<td><strong>Não Alcoólicos</strong></td>
+								<td>156</td>
+								<td>R$ 680</td>
+								<td style="color: var(--amarelo);">5%</td>
+							</tr>
+							<tr>
+								<td><strong>Tabacaria</strong></td>
+								<td>32</td>
+								<td>R$ 420</td>
+								<td style="color: var(--amarelo);">3%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Top 10 Produtos Mais Vendidos</h3>
+					<table class="table-simple">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Qtd</th>
+								<th>Faturamento</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><strong>Heineken 600ml</strong></td>
+								<td>182</td>
+								<td>R$ 2.912</td>
+							</tr>
+							<tr>
+								<td><strong>Corona 330ml</strong></td>
+								<td>156</td>
+								<td>R$ 2.184</td>
+							</tr>
+							<tr>
+								<td><strong>Red Bull 250ml</strong></td>
+								<td>312</td>
+								<td>R$ 2.808</td>
+							</tr>
+							<tr>
+								<td><strong>Red Label 1L</strong></td>
+								<td>48</td>
+								<td>R$ 4.560</td>
+							</tr>
+							<tr>
+								<td><strong>Skol 1L</strong></td>
+								<td>98</td>
+								<td>R$ 1.176</td>
+							</tr>
+							<tr>
+								<td><strong>Balde Heineken</strong></td>
+								<td>12</td>
+								<td>R$ 576</td>
+							</tr>
+							<tr>
+								<td><strong>Seagers Gin</strong></td>
+								<td>8</td>
+								<td>R$ 680</td>
+							</tr>
+							<tr>
+								<td><strong>Garrafa Baly</strong></td>
+								<td>45</td>
+								<td>R$ 360</td>
+							</tr>
+							<tr>
+								<td><strong>Copão Smirnoff + Baly</strong></td>
+								<td>24</td>
+								<td>R$ 432</td>
+							</tr>
+							<tr>
+								<td><strong>Budweiser 1L</strong></td>
+								<td>52</td>
+								<td>R$ 780</td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h3 class="section-title" style="margin-top: 16px;">Análise Financeira</h3>
+					<div style="font-size: 12px; line-height: 1.8;">
+						<div style="background: #1a2a1a; padding: 8px; border-radius: 6px; margin-bottom: 8px;">
+							<div><strong style="color: #8ae08a;">Faturamento Total:</strong> R$ 16.040</div>
+							<div><strong style="color: #8ae08a;">Custo Total:</strong> R$ 9.936</div>
+							<div><strong style="color: var(--amarelo);">Lucro Bruto:</strong> R$ 6.104</div>
+							<div><strong style="color: var(--amarelo);">Margem:</strong> 38,1%</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== ANÁLISES ========== -->
+		<div id="analytics" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">ANÁLISES AVANÇADAS</div>
+					<h1>Painel de Vendas com Gráficos</h1>
+				</div>
+				<div class="meta">Análise em tempo real | Últimos 30 dias</div>
+			</div>
+
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+				<div class="card">
+					<h2>Receita - Hoje</h2>
+					<span id="analyticsRevenueToday">R$ 0,00</span>
+					<div class="kpi-trend" id="analyticsRevenueTrend">▲ Carregando...</div>
+				</div>
+				<div class="card">
+					<h2>Receita - 30 dias</h2>
+					<span id="analyticsRevenueMonth">R$ 0,00</span>
+					<div class="kpi-trend">Período completo</div>
+				</div>
+				<div class="card">
+					<h2>Transações - Hoje</h2>
+					<span id="analyticsTicketsToday">0</span>
+					<div class="kpi-trend">Caixa aberto</div>
+				</div>
+				<div class="card">
+					<h2>Ticket Médio</h2>
+					<span id="analyticsAvgTicket">R$ 0,00</span>
+					<div class="kpi-trend">Últimos 30 dias</div>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="chart-container">
+					<h3 class="section-title">Faturamento vs Transações (30 dias)</h3>
+					<div class="chart-wrapper">
+						<canvas id="revenueChart"></canvas>
+					</div>
+				</div>
+				<div class="chart-container">
+					<h3 class="section-title">Vendas por Categoria</h3>
+					<div class="chart-wrapper">
+						<canvas id="categoryChart"></canvas>
+					</div>
+				</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="chart-container">
+					<h3 class="section-title">Top 10 Produtos Mais Vendidos</h3>
+					<table class="table-simple">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Qtd</th>
+								<th>Faturamento</th>
+								<th>%</th>
+							</tr>
+						</thead>
+						<tbody id="topProductsBody">
+							<tr><td colspan="4" style="text-align: center; color: var(--muted);">Carregando...</td></tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="chart-container">
+					<h3 class="section-title">Busca Rápida de Produtos</h3>
+					<div class="search-container">
+						<span class="search-icon">•</span>
+						<input type="text" class="search-input" id="productSearchBox" placeholder="Digite nome ou código..." onkeyup="handleQuickSearch(event)">
+						<div class="search-results" id="quickSearchResults"></div>
+					</div>
+					<div style="margin-top: 12px; font-size: 11px; color: var(--muted);">
+						Digite para buscar produtos por nome ou código de barras. Clique para adicionar ao carrinho da aba Bebidas.
+					</div>
+				</div>
+			</div>
+
+			<div style="padding: 20px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(0,0,0,0) 100%); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 12px; margin-top: 20px;">
+				<h3 style="margin-top: 0; color: var(--amarelo);">💡 Integração com Backend Node.js</h3>
+				<div style="font-size: 13px; color: var(--texto-sec); line-height: 1.8;">
+					<p>Os gráficos carregam dados via API em <strong>http://localhost:3333/api</strong></p>
+					<p style="color: #8ae08a;">✓ Endpoints implementados:</p>
+					<ul style="margin: 10px 0; padding-left: 20px;">
+						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/summary</code> - KPIs período</li>
+						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/revenue-chart</code> - Gráfico receita</li>
+						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/category-chart</code> - Gráfico categorias</li>
+						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/products-search?q=termo</code> - Busca de produtos</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+
+		<!-- ========== SETTINGS ========== -->
+		<div id="settings" class="view">
+			<div class="topbar">
+				<div>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Configurações do Sistema POS</h1>
+				</div>
+				<div class="meta">Gerenciar loja e preferências</div>
+			</div>
+
+			<div class="grid-2">
+				<div class="panel">
+					<h3 class="section-title">Dados da Loja</h3>
+					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">Nome da Loja</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="Flash Castelo">
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">CNPJ</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="12.345.678/0001-90">
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">Telefone</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="(11) 98765-4321">
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">E-mail</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="contato@flashcastelo.com">
+						</div>
+					</div>
+
+					<h3 class="section-title">Horários de Operação</h3>
+				<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11px;">
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Segunda-feira:</strong> <span style="color: #f59e0b;">Fechado</span>
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Terça-feira:</strong> 17h00 – 00h00
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Quarta-feira:</strong> 17h00 – 00h00
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Quinta-feira:</strong> 18h00 – 02h00
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Sexta-feira:</strong> 18h00 – 02h30
+					</div>
+					<div style="margin-bottom: 6px; padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Sábado:</strong> 18h00 – 02h30
+					</div>
+					<div style="padding: 6px; background: #0a0a0a; border-radius: 4px;">
+						<strong style="color: var(--amarelo);">Domingo:</strong> <span style="color: #f59e0b;">Fechado</span>
+					</div>
+
+					<h3 class="section-title">Metas Operacionais</h3>
+					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px;">
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">Meta de Vendas Diária (R$)</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="600">
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">Margem Mínima (%)</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="36">
+						</div>
+						<div>
+							<label style="font-size: 11px; color: #888;">Ticket Médio Esperado (R$)</label>
+							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="48"
+						</div>
+					</div>
+				</div>
+
+				<div class="panel">
+					<h3 class="section-title">Integração Rede Laranjinha Smart</h3>
+					<div style="background: linear-gradient(135deg, #1a2a1a 0%, #1a1a2a 100%); padding: 12px; border-radius: 6px; border: 1px solid #3a4a3a; margin-bottom: 12px;">
+						<div style="display: flex; align-items: center; margin-bottom: 12px;">
+							<span id="redeStatusIndicator" style="width: 12px; height: 12px; background: #fbbf24; border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite;"></span>
+							<span id="redeStatusText" style="color: #fbbf24;"><strong>Detectando servidor...</strong></span>
+						</div>
+						<div style="font-size: 11px; color: #8ae08a; line-height: 1.8;">
+							<div><strong>Modo:</strong> <span id="paymentMode">Verificando...</span></div>
+							<div><strong>Servidor API:</strong> <span id="serverStatus">Conectando...</span></div>
+							<div><strong>Terminal ID:</strong> POS-001</div>
+							<div><strong>Série:</strong> LRJ008-000421</div>
+							<div><strong>Modelo:</strong> Laranjinha Smart (Maquininha)</div>
+							<div><strong>Firmware:</strong> v2.4.1</div>
+							<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #3a4a3a;">
+								<div><strong>Última Transação:</strong> <span id="lastTransaction">Nenhuma</span></div>
+								<div><strong>Transações Hoje:</strong> <span id="transactionsCount">0</span></div>
+								<div><strong>Total Processado:</strong> R$ <span id="totalProcessed">0,00</span></div>
+							</div>
+							<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #3a4a3a;">
+								<div><strong>Status API:</strong> <span id="apiStatus">Conectando...</span></div>
+								<div><strong>Latência:</strong> <span id="latency">--ms</span></div>
+								<div><strong>Última Sincronização:</strong> <span id="lastSync">Nunca</span></div>
+								<div><strong>Segurança:</strong> <span id="securityStatus">Verificando...</span></div>
+							</div>
+						</div>
+					</div>
+
+					<h3 class="section-title">Configurações de Transação</h3>
+					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 11px;">
+						<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+							<div>
+								<label style="display: block; color: #888; margin-bottom: 4px;">Tipo de Transação</label>
+								<select style="width: 100%; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;">
+									<option>Débito</option>
+									<option selected>Crédito</option>
+									<option>Vale Refeição</option>
+								</select>
+							</div>
+							<div>
+								<label style="display: block; color: #888; margin-bottom: 4px;">Parcelas</label>
+								<select style="width: 100%; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;">
+									<option selected>À Vista (1x)</option>
+									<option>2x</option>
+									<option>3x</option>
+									<option>6x</option>
+									<option>12x</option>
+								</select>
+							</div>
+						</div>
+						<div style="display: flex; gap: 8px;">
+							<button style="flex: 1; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px; cursor: pointer; font-size: 11px;">Testar Conexão</button>
+							<button style="flex: 1; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px; cursor: pointer; font-size: 11px;">Sincronizar Agora</button>
+						</div>
+					</div>
+
+					<h3 class="section-title">Métodos de Pagamento</h3>
+					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox" checked> Cartão de Crédito (Rede)
+							</label>
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox" checked> Cartão de Débito (Rede)
+							</label>
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox" checked> PIX
+							</label>
+						</div>
+						<div style="margin-bottom: 8px;">
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox" checked> Dinheiro
+							</label>
+						</div>
+						<div>
+							<label style="font-size: 11px; color: #888;">
+								<input type="checkbox"> Vale Refeição/Alimentação
+							</label>
+						</div>
+					</div>
+
+					<h3 class="section-title">Pontos de Reposição</h3>
+					<table class="table-simple" style="font-size: 11px;">
+						<thead>
+							<tr>
+								<th>Produto</th>
+								<th>Mín</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td><strong>Heineken</strong></td>
+								<td><input type="text" style="width: 40px; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 3px;" value="20"></td>
+							</tr>
+							<tr>
+								<td><strong>Corona</strong></td>
+								<td><input type="text" style="width: 40px; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 3px;" value="15"></td>
+							</tr>
+							<tr>
+								<td><strong>Red Label</strong></td>
+								<td><input type="text" style="width: 40px; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 3px;" value="10"></td>
+							</tr>
+							<tr>
+								<td><strong>Jack</strong></td>
+								<td><input type="text" style="width: 40px; padding: 4px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 3px;" value="5"></td>
+							</tr>
+						</tbody>
+					</table>
+
+					<h3 class="section-title" style="margin-top: 12px;">Backup & Sincronização</h3>
+					<div style="font-size: 11px;">
+						<button style="width: 100%; padding: 8px; background: #facc15; color: #090909; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 8px;"><strong>↓ Fazer Backup Agora</strong></button>
+						<button style="width: 100%; padding: 8px; background: #333; color: #ccc; border: none; border-radius: 4px; cursor: pointer;"><strong>↑ Sincronizar com Nuvem</strong></button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- PAYMENT MODAL -->
+	<div id="paymentModal" class="modal-overlay">
+		<div class="modal">
+			<h3>Processar Pagamento</h3>
+			<div style="padding: 12px; background: var(--preto-card-2); border-radius: 8px; margin-bottom: 12px;">
+				<div style="display: grid; grid-template-columns: auto 1fr; gap: 8px; font-size: 13px;">
+					<div>Total:</div>
+					<div style="text-align: right; color: var(--amarelo); font-weight: bold;" id="modalTotal">R$ 0,00</div>
+					<div>Método:</div>
+					<div style="text-align: right;" id="modalMethod">Cartão (Rede)</div>
+				</div>
+			</div>
+
+			<div id="cardPaymentUI" style="padding: 12px; background: #1a2414; border: 1px solid #3a4a3a; border-radius: 8px; margin-bottom: 12px;">
+				<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">🔗 Integração Rede Laranjinha Smart</h4>
+				
+				<!-- Status Conexão -->
+				<div style="font-size: 12px; color: #8ae08a; margin-bottom: 12px; padding: 8px; background: #0f1a0f; border-radius: 4px; border-left: 3px solid #8ae08a;">
+					<div style="display: flex; align-items: center; margin-bottom: 6px;">
+						<span id="connectionStatus" style="width: 12px; height: 12px; background: #8ae08a; border-radius: 50%; margin-right: 8px; display: inline-block; animation: pulse 2s infinite;"></span>
+						<strong id="connectionText">Conectado ao POS-001</strong>
+					</div>
+					<div style="font-size: 11px; color: #6db86d; margin-top: 4px;">
+						Série: LRJ008-000421 | Firmware: v2.4.1
+					</div>
+				</div>
+
+				<!-- Fluxo de Pagamento -->
+				<div id="paymentFlow" style="padding: 12px; background: #0f1a0f; border-radius: 4px;">
+					<div style="text-align: center; margin-bottom: 12px;">
+						<div style="font-size: 28px; margin-bottom: 8px;">💳</div>
+						<div id="paymentStage" style="font-size: 13px; font-weight: bold; color: var(--amarelo);">Aguardando cartão...</div>
+						<div id="paymentStageDesc" style="font-size: 11px; color: #8ae08a; margin-top: 4px;">Aproxime o cartão, insira ou passe</div>chopp
+					</div>
+					
+					<!-- Barra de progresso -->
+					<div style="height: 24px; background: #0a0f0a; border-radius: 4px; overflow: hidden; position: relative;">
+						<div id="progressBar" style="height: 100%; background: linear-gradient(90deg, #8ae08a 0%, #4ade80 100%); width: 0%; transition: width 0.3s ease; display: flex; align-items: center; justify-content: center;">
+							<span id="progressText" style="font-size: 10px; color: #000; font-weight: bold;"></span>
+						</div>
+					</div>
+					
+					<!-- Informações detalhadas -->
+					<div id="paymentDetails" style="font-size: 11px; color: #8ae08a; margin-top: 12px; display: none;">
+						<div style="padding: 8px; background: #1a2414; border-radius: 3px; line-height: 1.6;">
+							<div><strong>NSU:</strong> <span id="nsuNumber">000000</span></div>
+							<div><strong>Autorizador:</strong> <span id="authorizer">Aguardando...</span></div>
+							<div><strong>Código Auth:</strong> <span id="authCode">-</span></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="paymentActions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+				<button class="btn-secondary" style="width: 100%;" onclick="closePaymentModal()">Cancelar</button>
+				<button class="btn-pay" style="margin: 0;" id="confirmPaymentBtn" onclick="confirmPayment()">Processar</button>
+			</div>
+		</div>
+	</div>
+
+	<script>
+		// ============================================
+		// INTEGRAÇÃO COM SERVIDOR NODE.JS / REDE
+		// ============================================
+
+		let PAYMENT_API = {
+			serverUrl: 'http://localhost:3000',
+			isConnected: false,
+			mode: 'SIMULATION' // ou 'PRODUCTION'
+		};
+
+		// Rastrear transações para painel REDE
+		let REDE_TRANSACTIONS = {
+			today: 0,
+			total: 0.00,
+			last: null,
+			list: []
+		};
+
+		// Detectar se servidor Node.js está rodando
+		async function detectPaymentServer() {
+			try {
+				const response = await fetch(`${PAYMENT_API.serverUrl}/`, {
+					method: 'GET',
+					mode: 'cors',
+					timeout: 3000
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					PAYMENT_API.isConnected = true;
+					PAYMENT_API.mode = data.rede.configured ? 'PRODUCTION' : 'SIMULATION';
+					
+					console.log(`✅ Servidor Node.js detectado!`);
+					console.log(`   Mode: ${PAYMENT_API.mode}`);
+					console.log(`   REDE Configurada: ${data.rede.configured}`);
+					console.log(`   Terminal: ${data.rede.terminal}`);
+					
+					// Atualizar painel REDE
+					updateREDEPanel(PAYMENT_API.mode);
+					
+					return true;
+				}
+			} catch (error) {
+				console.warn('⚠️  Servidor Node.js não encontrado. Usando simulação local.');
+				PAYMENT_API.isConnected = false;
+				PAYMENT_API.mode = 'SIMULATION';
+				updateREDEPanel('SIMULATION');
+				return false;
+			}
+		}
+
+		function updateREDEPanel(mode) {
+			// Atualizar status visual
+			const indicator = document.getElementById('redeStatusIndicator');
+			const statusText = document.getElementById('redeStatusText');
+			const paymentModeEl = document.getElementById('paymentMode');
+			const serverStatusEl = document.getElementById('serverStatus');
+			const apiStatusEl = document.getElementById('apiStatus');
+			const securityStatusEl = document.getElementById('securityStatus');
+
+			if (PAYMENT_API.isConnected) {
+				// Servidor detectado
+				indicator.style.background = '#8ae08a';
+				statusText.innerHTML = '<span style="color: #8ae08a;">✓ Servidor Detectado</span>';
+				paymentModeEl.textContent = mode === 'PRODUCTION' ? '🔴 PRODUÇÃO (REDE Real)' : '🟡 SIMULAÇÃO (Demo)';
+				serverStatusEl.innerHTML = '<span style="color: #8ae08a;">✓ Ativo em localhost:3000</span>';
+				apiStatusEl.innerHTML = '<span style="color: #8ae08a;">✓ Online</span>';
+				securityStatusEl.innerHTML = '<span style="color: #8ae08a;">✓ Seguro</span>';
+				
+				// Atualizar última sincronização
+				const now = new Date();
+				const timeStr = now.toLocaleTimeString('pt-BR');
+				document.getElementById('lastSync').textContent = 'Agora (' + timeStr + ')';
+				
+				// Pausar animação de pulso
+				indicator.style.animation = 'none';
+			} else {
+				// Servidor não detectado - modo simulação
+				indicator.style.background = '#fbbf24';
+				statusText.innerHTML = '<span style="color: #fbbf24;">⚠️ Modo Simulação</span>';
+				paymentModeEl.textContent = '🟡 SIMULAÇÃO (Demo)';
+				serverStatusEl.innerHTML = '<span style="color: #f59e0b;">⚠️ Servidor Node.js não conectado</span>';
+				apiStatusEl.innerHTML = '<span style="color: #f59e0b;">⚠️ Processamento Local</span>';
+				securityStatusEl.innerHTML = '<span style="color: #f59e0b;">⚠️ Modo Demo</span>';
+				document.getElementById('lastSync').textContent = 'Nunca';
+				
+				// Manter animação de pulso
+				indicator.style.animation = 'pulse 2s infinite';
+			}
+		}
+
+		function updateREDETransactionPanel(amount, nsu, authCode) {
+			// Incrementar contadores de transação
+			REDE_TRANSACTIONS.today++;
+			REDE_TRANSACTIONS.total += amount;
+			REDE_TRANSACTIONS.last = {
+				amount: amount,
+				nsu: nsu,
+				authCode: authCode,
+				timestamp: new Date()
+			};
+
+			// Adicionar à lista (máximo 50 transações recentes)
+			REDE_TRANSACTIONS.list.unshift(REDE_TRANSACTIONS.last);
+			if (REDE_TRANSACTIONS.list.length > 50) {
+				REDE_TRANSACTIONS.list.pop();
+			}
+
+			// Atualizar painel Configurações
+			if (document.getElementById('transactionsCount')) {
+				document.getElementById('transactionsCount').textContent = REDE_TRANSACTIONS.today;
+				document.getElementById('totalProcessed').textContent = REDE_TRANSACTIONS.total.toFixed(2);
+				
+				if (REDE_TRANSACTIONS.last) {
+					const time = REDE_TRANSACTIONS.last.timestamp.toLocaleTimeString('pt-BR');
+					document.getElementById('lastTransaction').textContent = `NSU: ${nsu} (${time})`;
+				}
+			}
+		}
+
+		// Função para processar pagamento com SERVIDOR REAL
+		async function processRealPayment(paymentData) {
+			try {
+				showPaymentStage('Enviando para REDE...', 'Conectando ao servidor de pagamento');
+				
+				// Validar dados básicos
+				if (!paymentData.cardNumber || paymentData.cardNumber.length < 13) {
+					throw new Error('Número do cartão inválido');
+				}
+
+				// Preparar requisição
+				const requestData = {
+					amount: paymentData.amount,
+					installments: paymentData.installments || 1,
+					cardNumber: paymentData.cardNumber,
+					cardHolder: paymentData.cardHolder,
+					expirationMonth: parseInt(paymentData.expirationMonth),
+					expirationYear: parseInt(paymentData.expirationYear),
+					cvv: paymentData.cvv
+				};
+
+				console.log('📤 Enviando requisição para API:', {
+					amount: requestData.amount,
+					cardLast4: requestData.cardNumber.slice(-4)
+				});
+
+				// Chamar API Node.js
+				const response = await fetch(`${PAYMENT_API.serverUrl}/api/payment/process`, {
+					method: 'POST',
+					mode: 'cors',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(requestData),
+					timeout: 30000
+				});
+
+				if (!response.ok) {
+					throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+				}
+
+				const result = await response.json();
+
+				console.log('✅ Resposta recebida:', result);
+
+				if (result.success) {
+					// Pagamento aprovado!
+					completePaymentReal(paymentData.amount, result);
+				} else {
+					// Pagamento recusado
+					showPaymentStage('❌ Transação Recusada', result.error || 'Erro ao processar');
+					setTimeout(() => {
+						alert(`❌ PAGAMENTO RECUSADO\n\nMotivo: ${result.error}\nCódigo: ${result.status}`);
+						resetPaymentUI();
+					}, 1500);
+				}
+
+			} catch (error) {
+				console.error('❌ Erro ao processar pagamento real:', error);
+				
+				showPaymentStage('⚠️ Erro de Conexão', error.message);
+				
+				setTimeout(() => {
+					alert(`⚠️ Erro ao conectar com o servidor de pagamento\n\n${error.message}\n\nTentando modo simulação...`);
+					// Fallback para simulação
+					simulatePaymentProcessing(paymentData.amount);
+				}, 1500);
+			}
+		}
+
+		// Completar pagamento com dados REAIS da REDE
+		function completePaymentReal(total, redeData) {
+			// Atualizar painel REDE
+			updateREDETransactionPanel(total, redeData.nsu, redeData.authCode);
+			
+			// Atualizar UI com dados reais da REDE
+			document.getElementById('paymentDetails').style.display = 'block';
+			document.getElementById('nsuNumber').textContent = redeData.nsu;
+			document.getElementById('authCode').textContent = redeData.authCode;
+			document.getElementById('authorizer').textContent = redeData.bank || 'REDE';
+			
+			showPaymentStage('✅ Transação Aprovada!', `R$ ${total.toFixed(2)} processado com sucesso`);
+
+			// Animar progresso
+			document.getElementById('progressBar').style.width = '100%';
+			document.getElementById('progressText').textContent = '100%';
+
+			setTimeout(() => {
+				const message = `✅ PAGAMENTO APROVADO - REDE\n\n` +
+					`Valor: R$ ${total.toFixed(2)}\n` +
+					`NSU: ${redeData.nsu}\n` +
+					`Autorização: ${redeData.authCode}\n` +
+					`Processador: ${redeData.bank || 'REDE'}\n` +
+					`ID Transação: ${redeData.transactionId}\n` +
+					`Data: ${new Date().toLocaleString('pt-BR')}\n\n` +
+					`[REDE Real - Terminal ${PAYMENT_API.mode === 'PRODUCTION' ? 'POS-001' : 'Simulado'}]`;
+				
+				alert(message);
+				
+				// Limpar carrinho e fechar modal
+				clearCart();
+				closePaymentModal();
+			}, 1500);
+		}
+		// Dados de produtos com imagens, código de barras e estoque
+		const products = [
+			{ id: 1, name: 'Heineken 600ml', price: 16.00, desc: 'Cerveja', image: 'assets/heineken.png', tag: 'TOP', barcode: '7891149076039', stock: 90, category: 'bebidas', type: 'cerveja' },
+			{ id: 2, name: 'Red Label 1L', price: 95.00, desc: 'Whisky Escocês', image: 'assets/redlabel.webp', barcode: '7891119000052', stock: 35, category: 'bebidas', type: 'destilado' },
+			{ id: 3, name: 'Garrafa Original 600ml', price: 14.00, desc: 'Cerveja', image: 'assets/original.png', barcode: '7891119ORIG', stock: 55, category: 'bebidas', type: 'cerveja' },
+			{ id: 4, name: 'Vodka Smirnoff', price: 35.00, desc: '998ml', image: 'assets/vodka.webp', barcode: '5449000041080', stock: 42, category: 'bebidas', type: 'destilado' },
+			{ id: 5, name: 'Red Bull 250ml', price: 9.00, desc: 'Energético', image: 'assets/redbull.png', tag: 'POPULAR', barcode: '9120099700009', stock: 156, category: 'bebidas', type: 'nao_alcoolico' },
+			{ id: 6, name: 'Corona 330ml', price: 14.00, desc: 'Cerveja', image: 'assets/corona.png', barcode: '7501055338098', stock: 68, category: 'bebidas', type: 'cerveja' },
+			{ id: 7, name: 'Copo Red Label + Red Bull', price: 35.00, desc: 'Combo', image: 'assets/copored.png', tag: 'COMBO', barcode: '7891119COMBO1', stock: 25, category: 'bebidas', type: 'combo' },
+			{ id: 8, name: 'Água 300ml', price: 3.00, desc: 'Destilada', image: 'assets/agua.jpeg', barcode: '7891000002007', stock: 120, category: 'bebidas', type: 'nao_alcoolico' },
+			{ id: 9, name: 'Skol 1L', price: 12.00, desc: 'Cerveja', image: 'assets/skol.png', barcode: '7891119SKOL1L', stock: 45, category: 'bebidas', type: 'cerveja' },
+			{ id: 10, name: 'Budweiser 1L', price: 15.00, desc: 'Cerveja', image: 'assets/budweiser1l.png', barcode: '7891119BUD1L', stock: 38, category: 'bebidas', type: 'cerveja' },
+			{ id: 11, name: 'Budweiser Long Neck', price: 16.00, desc: '330ml', image: 'assets/budweiserln.png', barcode: '7891119BUDLN', stock: 52, category: 'bebidas', type: 'cerveja' },
+			{ id: 12, name: 'Sessão de Narguilé', price: 20.00, desc: 'Montagem + Carvão', image: 'assets/narguile.webp', tag: 'NARGUILÉ', barcode: '7891119NARG01', stock: 50, category: 'tabacaria', type: '' },
+			{ id: 13, name: 'Ziggy Sabores', price: 14.00, desc: 'Essência', image: 'assets/ziggy.png', barcode: '7891119ZIGGY', stock: 80, category: 'tabacaria', type: '' },
+			{ id: 14, name: 'Onix Sabores', price: 12.00, desc: 'Essência', image: 'assets/onix.png', barcode: '7891119ONIX', stock: 75, category: 'tabacaria', type: '' },
+			{ id: 15, name: 'Seagers Gin', price: 85.00, desc: '750ml', image: 'assets/seagers.png', barcode: '5000200029031', stock: 22, category: 'bebidas', type: 'destilado' },
+			{ id: 16, name: 'Beefeter Gin', price: 95.00, desc: '750ml', image: 'assets/beefeter.webp', barcode: '5000207010000', stock: 18, category: 'bebidas', type: 'destilado' },
+			{ id: 17, name: 'Jack Maçã', price: 168.00, desc: 'Whisky com Maçã', image: 'assets/jackmaca.webp', barcode: '7891119JACMAC', stock: 30, category: 'bebidas', type: 'destilado' },
+			{ id: 18, name: 'Jack Mel', price: 168.00, desc: 'Whisky com Mel', image: 'assets/jackmel.png', barcode: '7891119JACMEL', stock: 28, category: 'bebidas', type: 'destilado' },
+			{ id: 19, name: 'Jack Fire', price: 168.00, desc: 'Whisky Especiado', image: 'assets/jackfire.png', barcode: '7891119JACFIR', stock: 24, category: 'bebidas', type: 'destilado' },
+			{ id: 20, name: 'Garrafa Askov', price: 45.00, desc: 'Bebida Alcoólica 970ml', image: 'assets/askov.webp', barcode: '7891119ASKOV', stock: 28, category: 'bebidas', type: 'destilado' },
+			{ id: 21, name: 'Baly 2L', price: 12.00, desc: 'Bebida Sabor 2L', image: 'assets/balymelancia.webp', barcode: '7891119BALY', stock: 70, category: 'bebidas', type: 'nao_alcoolico' },
+			{ id: 22, name: 'Vibe 2L', price: 9.00, desc: 'Suco Natural 2L', image: 'assets/vibe.png', barcode: '7891119VIBE', stock: 85, category: 'bebidas', type: 'nao_alcoolico' },
+			{ id: 23, name: 'Copão + Baly Sabores', price: 40.00, desc: 'Copo Grande + Bebida', image: 'assets/copaobaly.webp', tag: 'COMBO', barcode: '7891119COPBLY', stock: 35, category: 'bebidas', type: 'combo' },
+			{ id: 24, name: 'Copão Smirnoff + Baly', price: 18.00, desc: 'Copo Grande + Bebida', image: 'assets/copaosmir.png', tag: 'COMBO', barcode: '7891119COPSMI', stock: 28, category: 'bebidas', type: 'combo' },
+			{ id: 25, name: 'Copão Askov + Vibe', price: 12.00, desc: 'Copo Grande + Suco', image: 'assets/copaoaskov.png', tag: 'COMBO', barcode: '7891119COPASK', stock: 30, category: 'bebidas', type: 'combo' },
+			{ id: 26, name: 'Balde Heineken', price: 48.00, desc: '3x 600ml', image: 'assets/baldeheineken.png', tag: 'BALDE', barcode: '7891119BALDHE', stock: 15, category: 'bebidas', type: 'combo' },
+			{ id: 27, name: 'Balde Original', price: 42.00, desc: '3x 600ml', image: 'assets/baldeoriginal.png', tag: 'BALDE', barcode: '7891119BALDOR', stock: 18, category: 'bebidas', type: 'combo' },
+			{ id: 28, name: 'Balde Skol', price: 36.00, desc: '3x 1L', image: 'assets/baldeskol.png', tag: 'BALDE', barcode: '7891119BALDSK', stock: 16, category: 'bebidas', type: 'combo' },
+			{ id: 29, name: 'Balde Budweiser', price: 45.00, desc: '3x 1L', image: 'assets/baldebudweiser.png', tag: 'BALDE', barcode: '7891119BALDBW', stock: 14, category: 'bebidas', type: 'combo' },
+			{ id: 30, name: 'Monster Sabores 473ml', price: 12.00, desc: 'Energético', image: 'assets/monster.png', tag: 'NOVO', barcode: '7891119MONST', stock: 60, category: 'bebidas', type: 'nao_alcoolico' },
+			{ id: 31, name: 'Gelo Sabores', price: 6.00, desc: 'Gelo aromatizado', image: 'assets/gelo.jpg', tag: 'NOVO', barcode: '7891119GELO', stock: 90, category: 'bebidas', type: 'nao_alcoolico' },
+		];
+
+		let cart = [];
+		let stockData = {};
+		let totalPurchases = 0;
+		let totalSales = 0;
+		let currentDrinkType = 'cerveja'; // 'cerveja', 'destilado', 'nao_alcoolico', 'combo'
+
+		// Inicializar estoque
+		function initStock() {
+			products.forEach(p => {
+				stockData[p.id] = p.stock;
+			});
+		}
+
+		function populatePurchaseProductOptions() {
+			const select = document.getElementById('purchaseProductSelect');
+			if (!select) return;
+
+			select.innerHTML = products
+				.map((product) => `<option value="${product.id}">${product.name}</option>`)
+				.join('');
+		}
+
+		function updateFinancialSummary() {
+			const purchasesEl = document.getElementById('totalPurchasesValue');
+			const salesEl = document.getElementById('totalSalesValue');
+			if (purchasesEl) purchasesEl.textContent = `R$ ${totalPurchases.toFixed(2)}`;
+			if (salesEl) salesEl.textContent = `R$ ${totalSales.toFixed(2)}`;
+		}
+
+		function registerPurchase() {
+			const productId = Number(document.getElementById('purchaseProductSelect')?.value);
+			const quantity = Number(document.getElementById('purchaseQtyInput')?.value || 0);
+			const unitCost = Number(document.getElementById('purchaseUnitCostInput')?.value || 0);
+			const note = (document.getElementById('purchaseNoteInput')?.value || '').trim();
+
+			if (!productId) {
+				alert('Selecione um produto para registrar a compra.');
+				return;
+			}
+
+			if (!Number.isFinite(quantity) || quantity <= 0) {
+				alert('Informe uma quantidade válida maior que zero.');
+				return;
+			}
+
+			if (!Number.isFinite(unitCost) || unitCost < 0) {
+				alert('Informe um custo unitário válido.');
+				return;
+			}
+
+			stockData[productId] = (stockData[productId] || 0) + quantity;
+			totalPurchases += quantity * unitCost;
+			updateFinancialSummary();
+
+			const product = products.find((p) => p.id === productId);
+			alert(`✓ Compra registrada: ${quantity}x ${product?.name || 'Produto'}\nCusto total: R$ ${(quantity * unitCost).toFixed(2)}${note ? `\nObs: ${note}` : ''}`);
+
+			document.getElementById('purchaseQtyInput').value = '';
+			document.getElementById('purchaseUnitCostInput').value = '';
+			document.getElementById('purchaseNoteInput').value = '';
+
+			renderProducts();
+			renderTabacaria();
+			updateInventoryTable();
+		}
+
+		function filterByType(type) {
+			currentDrinkType = type;
+			updateDrinkTypeTabs();
+		}
+
+		function updateDrinkTypeTabs() {
+			document.querySelectorAll('.drink-tab').forEach((tab) => {
+				tab.classList.toggle('active', tab.dataset.type === currentDrinkType);
+			});
+		}
+
+		function renderProducts() {
+			const grid = document.getElementById('productsGrid');
+			const filtered = products.filter(p => p.category === 'bebidas' && p.type === currentDrinkType);
+			grid.innerHTML = filtered.map(p => `
+				<div class="product-card" onclick="addToCart(${p.id})">
+					<div class="product-image">
+						${p.tag ? `<div class="product-tag">${p.tag}</div>` : ''}
+						<img src="${p.image}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Crect fill=%22%232a2a2a%22 width=%22180%22 height=%22180%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%239a9a9a%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3E${p.name.substring(0,6)}%3C/text%3E%3C/svg%3E'">
+					</div>
+					<div class="product-info">
+						<div class="product-name">${p.name}</div>
+						<div class="product-desc">${p.desc}</div>
+						<div style="font-size: 11px; color: #8ae08a; margin: 6px 0; font-weight: bold;">📦 ${stockData[p.id]} em estoque</div>
+						<div class="product-price">R$ ${p.price.toFixed(2)}</div>
+						<button class="btn-add" ${stockData[p.id] <= 0 ? 'disabled' : ''} style="${stockData[p.id] <= 0 ? 'opacity:0.5;cursor:not-allowed;' : ''}">Adicionar</button>
+					</div>
+				</div>
+			`).join('');
+		}
+
+		function renderTabacaria() {
+			const grid = document.getElementById('tabacariGrid');
+			const filtered = products.filter(p => p.category === 'tabacaria');
+			grid.innerHTML = filtered.map(p => `
+				<div class="product-card" onclick="addToCart(${p.id})">
+					<div class="product-image">
+						${p.tag ? `<div class="product-tag">${p.tag}</div>` : ''}
+						<img src="${p.image}" alt="${p.name}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22180%22 height=%22180%22%3E%3Crect fill=%22%232a2a2a%22 width=%22180%22 height=%22180%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2214%22 fill=%22%239a9a9a%22 text-anchor=%22middle%22 dominant-baseline=%22middle%22%3E${p.name.substring(0,6)}%3C/text%3E%3C/svg%3E'">
+					</div>
+					<div class="product-info">
+						<div class="product-name">${p.name}</div>
+						<div class="product-desc">${p.desc}</div>
+						<div style="font-size: 11px; color: #8ae08a; margin: 6px 0; font-weight: bold;">📦 ${stockData[p.id]} em estoque</div>
+						<div class="product-price">R$ ${p.price.toFixed(2)}</div>
+						<button class="btn-add" ${stockData[p.id] <= 0 ? 'disabled' : ''} style="${stockData[p.id] <= 0 ? 'opacity:0.5;cursor:not-allowed;' : ''}">Adicionar</button>
+					</div>
+				</div>
+			`).join('');
+		}
+
+		function addToCart(productId) {
+			const product = products.find(p => p.id === productId);
+			if (!product) return;
+			
+			// Verificar estoque
+			if (stockData[productId] <= 0) {
+				alert(`❌ ${product.name} não tem estoque!`);
+				return;
+			}
+			
+			// Diminuir estoque
+			stockData[productId] -= 1;
+			
+			const existing = cart.find(item => item.id === productId);
+			if (existing) {
+				existing.qty += 1;
+			} else {
+				cart.push({ ...product, qty: 1 });
+			}
+			renderCart();
+			renderProducts();
+			updateInventoryTable();
+		}
+
+		function renderCart() {
+			const el = document.getElementById('cartItems');
+			if (!cart.length) {
+				el.innerHTML = '<span style="color: var(--muted); text-align: center; font-size: 12px;">Vazio</span>';
+				updateTotal();
+				return;
+			}
+
+			el.innerHTML = cart.map((item, idx) => `
+				<div class="cart-item">
+					<div class="cart-item-name">${item.name} x${item.qty}</div>
+					<div style="color: var(--amarelo);">R$ ${(item.price * item.qty).toFixed(2)}</div>
+					<button style="padding: 4px 6px; font-size: 10px; cursor: pointer;" onclick="removeFromCart(${idx})">×</button>
+				</div>
+			`).join('');
+
+			updateTotal();
+		}
+
+		function removeFromCart(idx) {
+			const item = cart[idx];
+			// Devolve ao estoque
+			stockData[item.id] += item.qty;
+			cart.splice(idx, 1);
+			renderCart();
+			renderProducts();
+			updateInventoryTable();
+		}
+
+		function updateTotal() {
+			const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+			const discount = parseFloat(document.getElementById('discount').value) || 0;
+			const total = Math.max(0, subtotal - discount);
+
+			document.getElementById('subtotal').textContent = `R$ ${subtotal.toFixed(2)}`;
+			document.getElementById('total').textContent = `R$ ${total.toFixed(2)}`;
+			document.getElementById('modalTotal').textContent = `R$ ${total.toFixed(2)}`;
+		}
+
+		function clearCart(restoreStock = true) {
+			if (restoreStock) {
+				cart.forEach(item => {
+					stockData[item.id] += item.qty;
+				});
+			}
+			cart = [];
+			renderCart();
+			renderProducts();
+			renderTabacaria();
+			updateInventoryTable();
+		}
+
+		function finalizePay() {
+			if (!cart.length) {
+				alert('Carrinho vazio!');
+				return;
+			}
+
+			const method = document.getElementById('paymentMethod').value;
+			const methodLabel = { card: 'Cartão (Rede)', pix: 'PIX', cash: 'Dinheiro' }[method];
+			document.getElementById('modalMethod').textContent = methodLabel;
+
+			if (method === 'card') {
+				document.getElementById('cardPaymentUI').style.display = 'block';
+				// Inicia simulação de conexão com REDE quando abre modal
+				simulateRedeConnection();
+			} else {
+				document.getElementById('cardPaymentUI').style.display = 'none';
+			}
+
+			document.getElementById('paymentModal').classList.add('active');
+		}
+
+		function simulateRedeConnection() {
+			const statusEl = document.getElementById('connectionStatus');
+			const textEl = document.getElementById('connectionText');
+			
+			// Simular conexão
+			statusEl.style.background = '#fbbf24';
+			textEl.textContent = 'Conectando ao POS-001...';
+			
+			setTimeout(() => {
+				statusEl.style.background = '#8ae08a';
+				textEl.textContent = '✓ Conectado ao POS-001';
+				showPaymentStage('Aguardando transação...', 'Pressione ENTER para continuar');
+			}, 1000);
+		}
+
+		function showPaymentStage(stage, description) {
+			document.getElementById('paymentStage').textContent = stage;
+			document.getElementById('paymentStageDesc').textContent = description;
+		}
+
+		function closePaymentModal() {
+			document.getElementById('paymentModal').classList.remove('active');
+			resetPaymentUI();
+		}
+
+		function resetPaymentUI() {
+			document.getElementById('progressBar').style.width = '0%';
+			document.getElementById('progressText').textContent = '';
+			document.getElementById('paymentDetails').style.display = 'none';
+			document.getElementById('paymentActions').style.display = 'grid';
+			document.getElementById('confirmPaymentBtn').disabled = false;
+			document.getElementById('connectionStatus').style.background = '#8ae08a';
+			document.getElementById('connectionText').textContent = '✓ Conectado ao POS-001';
+			showPaymentStage('Aguardando cartão...', 'Aproxime o cartão, insira ou passe');
+		}
+
+		function confirmPayment() {
+			const total = cart.reduce((sum, item) => sum + (item.price * item.qty), 0) - (parseFloat(document.getElementById('discount').value) || 0);
+			
+			// Desabilitar botão durante processamento
+			document.getElementById('confirmPaymentBtn').disabled = true;
+			
+			// Se servidor está conectado, usar API real
+			if (PAYMENT_API.isConnected) {
+				processRealPayment({
+					amount: total,
+					cardNumber: '4111111111111111', // Usar formulário real em produção
+					cardHolder: 'CLIENTE TESTE',
+					expirationMonth: '12',
+					expirationYear: '2025',
+					cvv: '123',
+					installments: 1
+				});
+			} else {
+				// Fallback: Simular pagamento localmente
+				console.log('📱 Servidor não encontrado. Usando simulação local.');
+				simulatePaymentProcessing(total);
+			}
+		}
+
+		function simulatePaymentProcessing(total) {
+			const stages = [
+				{ progress: 20, stage: 'Lendo cartão...', desc: 'Processando dados do cartão' },
+				{ progress: 40, stage: 'Criptografando...', desc: 'Transmitindo para Rede com segurança' },
+				{ progress: 60, stage: 'Verificando...', desc: 'Aguardando resposta do banco' },
+				{ progress: 80, stage: 'Autorizando transação...', desc: 'Processando autorização' },
+				{ progress: 100, stage: '✓ Transação Aprovada!', desc: 'Pagamento processado com sucesso' }
+			];
+
+			let stageIndex = 0;
+			
+			const processStage = () => {
+				if (stageIndex < stages.length) {
+					const current = stages[stageIndex];
+					document.getElementById('progressBar').style.width = current.progress + '%';
+					document.getElementById('progressText').textContent = current.progress + '%';
+					showPaymentStage(current.stage, current.desc);
+					
+					stageIndex++;
+					setTimeout(processStage, 600);
+				} else {
+					// Pagamento completo
+					completePayment(total);
+				}
+			};
+			
+			processStage();
+		}
+
+		function completePayment(total) {
+			// Gerar NSU e código de autorização realistas
+			const nsu = String(Math.floor(Math.random() * 1000000)).padStart(6, '0');
+			const authCode = String(Math.floor(Math.random() * 100000)).padStart(6, '0');
+			const banks = ['Banco do Brasil', 'Caixa', 'Itaú', 'Santander', 'Bradesco'];
+			const bank = banks[Math.floor(Math.random() * banks.length)];
+			
+			// Atualizar painel REDE
+			updateREDETransactionPanel(total, nsu, authCode);
+			
+			// Mostrar detalhes da transação
+			document.getElementById('paymentDetails').style.display = 'block';
+			document.getElementById('nsuNumber').textContent = nsu;
+			document.getElementById('authCode').textContent = authCode;
+			document.getElementById('authorizer').textContent = bank;
+			
+			showPaymentStage('✓ Pagamento Aprovado!', `R$ ${total.toFixed(2)} processado com sucesso`);
+			
+			// Mostrar confirmação
+			setTimeout(() => {
+				alert(`✓ PAGAMENTO AUTORIZADO\n\nValor: R$ ${total.toFixed(2)}\nNSU: ${nsu}\nAutorizador: ${bank}\nCódigo: ${authCode}\n\nMaquininha Rede: POS-001\nData: ${new Date().toLocaleString('pt-BR')}`);
+				totalSales += total;
+				updateFinancialSummary();
+				
+				// Limpar carrinho e fechar modal
+				clearCart(false);
+				closePaymentModal();
+			}, 1500);
+		}
+
+		function scanBarcode(barcode) {
+			const product = products.find(p => p.barcode === barcode);
+			if (!product) {
+				alert('❌ Código de barras não encontrado: ' + barcode);
+				return;
+			}
+			addToCart(product.id);
+			document.getElementById('scannerInput').value = '';
+			document.getElementById('scannerInput').focus();
+		}
+
+		function updateInventoryTable() {
+			console.log('updateInventoryTable called');
+			const tbody = document.querySelector('#inventoryTable tbody');
+			if (!tbody) {
+				console.error('Tabela de inventário não encontrada!');
+				return;
+			}
+			console.log('Atualizando tabela com', products.length, 'produtos');
+			tbody.innerHTML = products.map(p => `
+				<tr>
+					<td><strong>${p.name}</strong></td>
+					<td>${stockData[p.id]}</td>
+					<td>${Math.floor(p.stock * 0.3)}</td>
+					<td><span class="status-badge ${stockData[p.id] <= Math.floor(p.stock * 0.3) ? 'status-warning' : 'status-ok'}">${stockData[p.id] <= Math.floor(p.stock * 0.3) ? 'BAIXO' : 'OK'}</span></td>
+					<td style="font-size: 11px; color: #8ae08a;">📦 ${p.barcode}</td>
+				</tr>
+			`).join('');
+		}
+
+		// Navegação de abas
+		document.querySelectorAll('.menu button').forEach(btn => {
+			btn.addEventListener('click', () => {
+				const viewName = btn.dataset.view;
+				console.log('Mudando para view:', viewName);
+				
+				const targetView = document.getElementById(viewName);
+				if (!targetView) {
+					console.error('View not found:', viewName);
+					return;
+				}
+				
+				document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+				targetView.classList.add('active');
+
+				document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+				btn.classList.add('active');
+
+				// Renderizar conteúdo específico da view
+				if (viewName === 'pdv') {
+					renderProducts();
+				} else if (viewName === 'tabacaria') {
+					renderTabacaria();
+				} else if (viewName === 'inventory') {
+					updateInventoryTable();
+				} else if (viewName === 'analytics') {
+					setTimeout(() => loadAnalyticsData(), 100);
+				}
+			});
+		});
+
+		// Inicializar quando DOM estiver pronto
+		console.log('Iniciando sistema...');
+		console.log('Verificando views:');
+		['dashboard', 'pdv', 'tabacaria', 'inventory', 'reports', 'settings'].forEach(viewId => {
+			const view = document.getElementById(viewId);
+			console.log(`  - View ${viewId}:`, view ? 'OK ✓' : 'FALTANDO ✗');
+		});
+		
+		initStock();
+		populatePurchaseProductOptions();
+		updateFinancialSummary();
+		renderProducts();
+		renderTabacaria();
+		updateInventoryTable();
+		
+		// Tentar carregar dados de analytics (se servidor estiver rodando)
+		setTimeout(() => loadAnalyticsData(), 500);
+		
+		// Detectar servidor Node.js
+		console.log('🔍 Detectando servidor de pagamento...');
+		detectPaymentServer().then(connected => {
+			if (connected) {
+				console.log('✅ MODO REDE REAL - Servidor Node.js ativo');
+			} else {
+				console.log('📱 MODO SIMULAÇÃO - Usando pagamentos locais');
+			}
+		});
+
+		// ============================================
+		// ANALYTICS & GRÁFICOS
+		// ============================================
+		
+		const API_ANALYTICS = 'http://localhost:3333/api';
+		let revenueChart = null;
+		let categoryChart = null;
+
+		async function loadAnalyticsData() {
+			try {
+				const [summary, revenue, category] = await Promise.all([
+					fetch(`${API_ANALYTICS}/dashboard/summary`).then(r => r.json()).catch(() => null),
+					fetch(`${API_ANALYTICS}/dashboard/revenue-chart`).then(r => r.json()).catch(() => null),
+					fetch(`${API_ANALYTICS}/dashboard/category-chart`).then(r => r.json()).catch(() => null)
+				]);
+
+				if (summary?.data) {
+					const today = summary.data.today;
+					const month = summary.data.last_30_days;
+
+					document.getElementById('analyticsRevenueToday').textContent = `R$ ${today.revenue.toFixed(2).replace('.', ',')}`;
+					document.getElementById('analyticsRevenueMonth').textContent = `R$ ${month.revenue.toFixed(2).replace('.', ',')}`;
+					document.getElementById('analyticsTicketsToday').textContent = today.tickets.toString();
+					document.getElementById('analyticsAvgTicket').textContent = `R$ ${month.avg_ticket.toFixed(2).replace('.', ',')}`;
+
+					if (summary.data.top_products && summary.data.top_products.length) {
+						const tbody = document.getElementById('topProductsBody');
+						const total = summary.data.top_products.reduce((sum, p) => sum + p.quantity, 0);
+						tbody.innerHTML = summary.data.top_products.map((item, idx) => `
+							<tr>
+								<td><strong>#${idx + 1} ${item.product_name}</strong></td>
+								<td>${item.quantity} un</td>
+								<td>-</td>
+								<td style="color: var(--amarelo);">${((item.quantity / total) * 100).toFixed(1)}%</td>
+							</tr>
+						`).join('');
+					}
+				}
+
+				if (revenue?.data) {
+					renderRevenueChart(revenue.data);
+				}
+
+				if (category?.data) {
+					renderCategoryChart(category.data);
+				}
+			} catch (error) {
+				console.warn('⚠️ Não foi possível carregar dados de analytics:', error.message);
+				console.log('💡 Certifique-se que o servidor Node.js está rodando em http://localhost:3333');
+			}
+		}
+
+		function renderRevenueChart(data) {
+			const ctx = document.getElementById('revenueChart');
+			if (!ctx) return;
+
+			if (revenueChart) revenueChart.destroy();
+
+			revenueChart = new Chart(ctx, {
+				type: 'line',
+				data: {
+					labels: data.labels.map(d => new Date(d).toLocaleDateString('pt-BR', { month: 'short', day: 'numeric' })),
+					datasets: data.datasets
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					interaction: { mode: 'index', intersect: false },
+					plugins: {
+						legend: {
+							labels: { color: '#d1d5db', font: { size: 12 } }
+						}
+					},
+					scales: {
+						y: {
+							beginAtZero: true,
+							grid: { color: '#262626' },
+							ticks: { color: '#9ca3af' }
+						},
+						x: {
+							grid: { display: false },
+							ticks: { color: '#9ca3af' }
+						}
+					}
+				}
+			});
+		}
+
+		function renderCategoryChart(data) {
+			const ctx = document.getElementById('categoryChart');
+			if (!ctx) return;
+
+			if (categoryChart) categoryChart.destroy();
+
+			categoryChart = new Chart(ctx, {
+				type: 'doughnut',
+				data: {
+					labels: data.labels,
+					datasets: data.datasets
+				},
+				options: {
+					responsive: true,
+					maintainAspectRatio: false,
+					plugins: {
+						legend: {
+							labels: { color: '#d1d5db', font: { size: 12 } }
+						}
+					}
+				}
+			});
+		}
+
+		async function handleQuickSearch(event) {
+			const query = event.target.value.trim();
+			const resultsDiv = document.getElementById('quickSearchResults');
+
+			if (query.length < 1) {
+				resultsDiv.classList.remove('show');
+				return;
+			}
+
+			try {
+				// Tentar API primeiro
+				const response = await fetch(`${API_ANALYTICS}/dashboard/products-search?q=${encodeURIComponent(query)}&limit=10`);
+				const data = await response.json();
+				let results = data.data || [];
+
+				// Fallback: buscar localmente se API falhar
+				if (results.length === 0) {
+					results = searchProductsLocal(query).map(p => ({
+						id: p.id,
+						name: p.name,
+						price: p.price,
+						stock: stockData[p.id] || 0
+					}));
+				}
+
+				resultsDiv.innerHTML = results.length
+					? results.map(product => `
+						<div class="search-result-item" onclick="addToCartFromSearch(${product.id})">
+							<div class="search-result-name">${product.name}</div>
+							<div class="search-result-price">R$ ${product.price.toFixed(2).replace('.', ',')} • Estoque: ${product.stock}</div>
+						</div>
+					`).join('')
+					: '<div class="search-result-item" style="cursor:default; color: #9ca3af;">Nenhum produto encontrado</div>';
+
+				resultsDiv.classList.add('show');
+			} catch (error) {
+				console.warn('Erro ao buscar produtos:', error.message);
+				// Fallback: buscar localmente
+				const results = searchProductsLocal(query);
+				const resultsDiv = document.getElementById('quickSearchResults');
+				resultsDiv.innerHTML = results.length
+					? results.map(product => `
+						<div class="search-result-item" onclick="addToCartFromSearch(${product.id})">
+							<div class="search-result-name">${product.name}</div>
+							<div class="search-result-price">R$ ${product.price.toFixed(2).replace('.', ',')} • Estoque: ${stockData[product.id] || 0}</div>
+						</div>
+					`).join('')
+					: '<div class="search-result-item" style="cursor:default; color: #9ca3af;">Nenhum produto encontrado</div>';
+				resultsDiv.classList.add('show');
+			}
+		}
+
+		function addToCartFromSearch(productId) {
+			if (productId > 0) {
+				addToCart(productId);
+				// Limpar busca e alternar para pdv
+				document.getElementById('productSearchBox').value = '';
+				document.getElementById('quickSearchResults').classList.remove('show');
+				
+				// Mostrar aba PDV
+				const pdvBtn = Array.from(document.querySelectorAll('.menu button')).find(btn => btn.dataset.view === 'pdv');
+				if (pdvBtn) pdvBtn.click();
+			}
+		}
+
+		function updateThemeButton(theme) {
+			const btn = document.querySelector('.theme-toggle');
+			if (!btn) return;
+			btn.textContent = theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo escuro';
+		}
+
+		function applyTheme(theme) {
+			document.documentElement.setAttribute('data-theme', theme);
+			document.documentElement.style.colorScheme = theme;
+			localStorage.setItem('flashcastelo-theme', theme);
+			updateThemeButton(theme);
+		}
+
+		function initTheme() {
+			const savedTheme = localStorage.getItem('flashcastelo-theme');
+			const theme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
+			applyTheme(theme);
+		}
+
+		function toggleTheme() {
+			const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+			applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+		}
+
+		// Função auxiliar para buscar apenas no catálogo (sem API)
+		function searchProductsLocal(query) {
+			const lowerQuery = query.toLowerCase();
+			return products.filter(p => 
+				p.name.toLowerCase().includes(lowerQuery) || 
+				p.barcode.includes(query)
+			).slice(0, 10);
+		}
+
+		initTheme();
+		console.log('Sistema inicializado!');
+	</script>
+</body>
+</html>

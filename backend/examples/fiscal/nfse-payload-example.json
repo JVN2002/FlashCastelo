@@ -1,0 +1,21 @@
+{
+  "prestador": {
+    "cnpj": "00000000000000",
+    "inscricao_municipal": "123456",
+    "codigo_municipio": "3548708"
+  },
+  "tomador": {
+    "razao_social": "Cliente Evento LTDA",
+    "cpf_cnpj": "11111111000199",
+    "email": "financeiro@cliente-evento.com.br"
+  },
+  "servico": {
+    "item_lista_servico": "17.01",
+    "codigo_tributario_municipio": "17.01/102104/1232",
+    "discriminacao": "Serviço eventual de catering para evento corporativo com montagem e operação de estação de hambúrguer artesanal.",
+    "valor_servicos": 1200,
+    "aliquota": 0.05
+  },
+  "natureza_operacao": "1",
+  "data_emissao": "2026-04-24T21:00:00-03:00"
+}

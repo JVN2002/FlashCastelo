@@ -1,41 +1,52 @@
+<div class="order-card-wrapper is-collapsed">
+	<button class="order-card-toggle" type="button" onclick="openOrderCard()">
+		🧾 Pedido em aberto (<span data-order-count>0</span>)
+	</button>
 
-<div class="cart-section">
-						<h3 style="margin-top: 0; color: var(--amarelo);">Carrinho</h3>
-						<div id="cartItems" class="cart-items">
-							<span style="color: var(--muted); text-align: center; font-size: 12px;">Vazio</span>
-						</div>
+	<div class="cart-section">
+		<div class="cart-section-header" data-order-card-drag-handle>
+			<h3 style="margin-top: 0; color: var(--amarelo);">Pedido para baixa</h3>
+			<div class="cart-section-header-actions">
+				<button class="cart-minimize-btn" type="button" onclick="minimizeOrderCard()" aria-label="Minimizar card do pedido">−</button>
+				<button class="cart-close-btn" type="button" onclick="closeOrderCard()" aria-label="Fechar card do pedido">×</button>
+			</div>
+		</div>
 
-						<div class="cart-summary">
-							<div class="cart-line">
-								<div>Subtotal:</div>
-								<div style="text-align: right;" id="subtotal">R$ 0,00</div>
-							</div>
-							<div class="cart-line">
-								<div>Desconto:</div>
-								<div style="text-align: right;">
-									<input type="number" id="discount" value="0" step="0.01" onchange="updateTotal()" style="width: 70px;">
-								</div>
-							</div>
-							<div class="cart-total">
-								<div id="total">R$ 0,00</div>
-							</div>
-						</div>
+		<div class="order-flow-status is-empty" data-order-flow-status>
+			<div class="order-flow-title" data-order-flow-title>Sem pedido em aberto</div>
+			<div class="order-flow-text" data-order-flow-text>Adicione itens para começar um novo pedido.</div>
+		</div>
 
-						<div style="padding: 12px; background: #1a2414; border: 1px solid #3a4a3a; border-radius: 8px; margin-bottom: 12px;">
-							<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">💳 Pagamento</h4>
-							<select id="paymentMethod" style="width: 100%; margin-bottom: 8px;">
-								<option value="card">Cartão (Rede)</option>
-								<option value="pix">PIX</option>
-								<option value="cash">Dinheiro</option>
-							</select>
-							<div style="padding: 8px; background: #0f1a0f; border-radius: 4px; margin-top: 8px; font-size: 11px; color: #8ae08a;">
-								<strong>Status Rede:</strong> Conectado ✓<br>
-								<strong>POS:</strong> POS-001 (Laranjinha Smart)<br>
-							</div>
-						</div>
+		<div id="cartItems" class="cart-items">
+			<span style="color: var(--muted); text-align: center; font-size: 12px;">Vazio</span>
+		</div>
 
-						<button class="btn-pay" onclick="finalizePay()">Processar Pagamento</button>
-						<button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="clearCart()">Limpar</button>
+		<div class="stock-consumption-card">
+			<div class="stock-consumption-title">Itens que vão dar baixa no estoque</div>
+			<div id="stockConsumptionItems" class="stock-consumption-items">
+				<div class="stock-consumption-empty">Sem itens selecionados.</div>
+			</div>
+		</div>
+
+		<div class="cart-summary">
+			<div class="cart-line">
+				<div>Subtotal:</div>
+				<div style="text-align: right;" id="subtotal">R$ 0,00</div>
+			</div>
+			<div class="cart-line">
+				<div>Desconto:</div>
+				<div style="text-align: right;">
+					<input type="number" id="discount" value="0" step="0.01" onchange="updateTotal()" style="width: 70px;">
+				</div>
+			</div>
+			<div class="cart-total">
+				<div id="total">R$ 0,00</div>
+			</div>
+		</div>
+
+		<button class="btn-pay" onclick="finalizeOrderFromCard()">Cobrar na maquininha e dar baixa</button>
+		<button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="clearCart()">Limpar pedido</button>
+	</div>
 </div>
 
 <div id="confirmation-window" class="Hidde">

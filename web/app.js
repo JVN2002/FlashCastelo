@@ -17,7 +17,7 @@ const kpiCards = document.getElementById('kpiCards');
 const topProducts = document.getElementById('topProducts');
 const productsTable = document.getElementById('productsTable');
 const lowStockList = document.getElementById('lowStockList');
-const redeStatusList = document.getElementById('redeStatusList');
+const machineStatusList = document.getElementById('redeStatusList');
 
 const viewTitle = document.getElementById('viewTitle');
 const menuButtons = document.querySelectorAll('.menu button');
@@ -108,23 +108,24 @@ function renderProducts(products) {
     : '<li>Nenhum ingrediente em estoque crítico.</li>';
 }
 
-function renderRedeStatus(overview) {
-  if (!redeStatusList) {
+function renderMachineStatus(overview) {
+  if (!machineStatusList) {
     return;
   }
 
-  const rede = overview?.rede_machine_api;
-  if (!rede) {
-    redeStatusList.innerHTML = '<li>Status da API REDE indisponível.</li>';
+  const machine = overview?.payment_machine_api || overview?.rede_machine_api;
+  if (!machine) {
+    machineStatusList.innerHTML = '<li>Status da maquininha indisponível.</li>';
     return;
   }
 
-  const modeLabel = rede.mode === 'SANDBOX' ? 'Sandbox' : 'Produção';
-  redeStatusList.innerHTML = `
-    <li>Status: ${rede.configured ? 'Configurada' : 'Pendente de credenciais'}</li>
+  const modeLabel = machine.mode === 'SANDBOX' ? 'Sandbox' : machine.mode;
+  machineStatusList.innerHTML = `
+    <li>Provedor: ${machine.provider || 'MERCADO_PAGO_POINT'}</li>
+    <li>Status: ${machine.configured ? 'Configurada' : 'Pendente de credenciais'}</li>
     <li>Modo: ${modeLabel}</li>
-    <li>Terminal: ${rede.terminal_id || '-'}</li>
-    <li>API: ${rede.api_url || '-'}</li>
+    <li>Terminal: ${machine.terminal_id || '-'}</li>
+    <li>API: ${machine.api_url || '-'}</li>
   `;
 }
 
@@ -145,7 +146,7 @@ async function refreshData() {
     state.products = products.data;
     renderKpis(kpis.data);
     renderProducts(products.data);
-    renderRedeStatus(overview.data);
+    renderMachineStatus(overview.data);
   } catch (error) {
     authStatus.textContent = `Erro ao atualizar dados: ${error.message}`;
   }

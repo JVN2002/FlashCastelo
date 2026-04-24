@@ -15,17 +15,16 @@
 			<p>Foodtruck Burger Station</p>
 		</div>
 
-		<div class="menu">
-			
-			<button class="active" data-view="dashboard">Dashboard</button>
-			<button data-view="cardapio">Cardápio</button>
-			<button data-view="pdv">Ingredientes</button>
-			<button data-view="tabacaria">Adicionais</button>
-			<button data-view="inventory">Estoque + Maquininha</button>
-			<button data-view="reports">Relatórios</button>
-			<button data-view="analytics">Análises</button>
-			<button data-view="settings">Configurações</button>
-		</div>
+			<div class="menu">
+				
+				<button class="active" data-view="dashboard">Dashboard</button>
+				<button data-view="cardapio">Cardápio</button>
+				<button data-view="pdv">Ingredientes + Adicionais</button>
+				<button data-view="inventory">Estoque + Maquininha</button>
+				<button data-view="reports">Relatórios</button>
+				<button data-view="fiscal">Fiscal (NF-e/NFS-e)</button>
+				<button data-view="settings">Configurações</button>
+			</div>
 
 		<button class="theme-toggle" onclick="toggleTheme()">Ativar modo claro</button>
 
@@ -43,9 +42,14 @@
 					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
 					<h1>Painel Estratégico do Foodtruck</h1>
 				</div>
-				<div class="meta">Hoje, 04 Mar 2026 • Turno Noite • Caixa #03</div>
 			</div>
 
+			<div class="dashboard-tabs" role="tablist" aria-label="Abas do dashboard">
+				<button class="dashboard-tab active" data-dashboard-tab="overview" role="tab" aria-selected="true">Visão Geral</button>
+				<button class="dashboard-tab" data-dashboard-tab="analytics" role="tab" aria-selected="false">Análises</button>
+			</div>
+
+			<div id="dashboardOverviewPanel" class="dashboard-panel active">
 			<div class="dashboard">
 				<div class="card">
 					<h2>Vendas Hoje</h2>
@@ -87,10 +91,10 @@
 					<span>0</span>
 					<div class="kpi-trend">Sem dados</div>
 				</div>
-			</div>
+				</div>
 
-			<div class="grid-2">
-				<div class="panel">
+				<div class="grid-2">
+					<div class="panel">
 					<h3 class="section-title">Desempenho por Categoria</h3>
 					<div class="sales-bars">
 						<div class="bar-row">
@@ -189,6 +193,94 @@
 					</table>
 				</div>
 			</div>
+			</div>
+
+			<div id="dashboardAnalyticsPanel" class="dashboard-panel">
+				<div class="dashboard-panel-meta">Análise em tempo real | Últimos 30 dias</div>
+
+				<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
+					<div class="card">
+						<h2>Receita - Hoje</h2>
+						<span id="analyticsRevenueToday">R$ 0,00</span>
+						<div class="kpi-trend" id="analyticsRevenueTrend">▲ Carregando...</div>
+					</div>
+					<div class="card">
+						<h2>Receita - 30 dias</h2>
+						<span id="analyticsRevenueMonth">R$ 0,00</span>
+						<div class="kpi-trend">Período completo</div>
+					</div>
+					<div class="card">
+						<h2>Transações - Hoje</h2>
+						<span id="analyticsTicketsToday">0</span>
+						<div class="kpi-trend">Caixa aberto</div>
+					</div>
+					<div class="card">
+						<h2>Ticket Médio</h2>
+						<span id="analyticsAvgTicket">R$ 0,00</span>
+						<div class="kpi-trend">Últimos 30 dias</div>
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="chart-container">
+						<h3 class="section-title">Faturamento vs Transações (30 dias)</h3>
+						<div class="chart-wrapper">
+							<canvas id="revenueChart"></canvas>
+						</div>
+					</div>
+					<div class="chart-container">
+						<h3 class="section-title">Vendas por Categoria</h3>
+						<div class="chart-wrapper">
+							<canvas id="categoryChart"></canvas>
+						</div>
+					</div>
+				</div>
+
+				<div class="grid-2">
+					<div class="chart-container">
+						<h3 class="section-title">Top 10 Produtos Mais Vendidos</h3>
+						<table class="table-simple">
+							<thead>
+								<tr>
+									<th>Produto</th>
+									<th>Qtd</th>
+									<th>Faturamento</th>
+									<th>%</th>
+								</tr>
+							</thead>
+							<tbody id="topProductsBody">
+								<tr><td colspan="4" style="text-align: center; color: var(--muted);">Carregando...</td></tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="chart-container">
+						<h3 class="section-title">Busca Rápida de Produtos</h3>
+						<div class="search-container">
+							<span class="search-icon">•</span>
+							<input type="text" class="search-input" id="productSearchBox" placeholder="Digite nome ou código..." onkeyup="handleQuickSearch(event)">
+							<div class="search-results" id="quickSearchResults"></div>
+						</div>
+						<div style="margin-top: 12px; font-size: 11px; color: var(--muted);">
+							Digite para buscar produtos por nome ou código de barras. Clique para adicionar ao carrinho da aba Ingredientes + Adicionais.
+						</div>
+					</div>
+				</div>
+
+				<div style="padding: 20px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(0,0,0,0) 100%); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 12px; margin-top: 20px;">
+					<h3 style="margin-top: 0; color: var(--amarelo);">💡 Integração com Backend Node.js</h3>
+					<div style="font-size: 13px; color: var(--texto-sec); line-height: 1.8;">
+						<p>Os gráficos carregam dados via API em <strong>http://localhost:3333/api</strong></p>
+						<p style="color: #8ae08a;">✓ Endpoints implementados:</p>
+						<ul style="margin: 10px 0; padding-left: 20px;">
+							<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/summary</code> - KPIs período</li>
+							<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/revenue-chart</code> - Gráfico receita</li>
+							<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/category-chart</code> - Gráfico categorias</li>
+							<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/products-search?q=termo</code> - Busca de produtos</li>
+						</ul>
+					</div>
+				</div>
+			</div>
 		</div>
 
 
@@ -199,48 +291,276 @@
 					<div class="topbar">
 						<div>
 							<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
-							<h1>Cardápio de lanches, porções e outros</h1>
+							<h1>Cardápio Flash Burguer</h1>
+							<p class="menu-subtitle">Padrão oficial do cardápio: lanches, adicionais, porções e sobremesa.</p>
 						</div>
 					</div>
 
-					<div class="topicos">
-						<div class="card" data-view="lanches">
-							<h1><b>LANCHES</b></h1>
-							<svg fill="#000000" viewBox="0 0 100 100" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="icon"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="_x31_"></g> <g id="_x32_"></g> <g id="_x33_"></g> <g id="_x34_"> <path d="M72.8,80.7H26.6c-5.9,0-10.7-4.8-10.7-10.7v-6c0-0.8,0.7-1.5,1.5-1.5h0.1c0.6,0,1.2,0.4,1.4,1c0.4,1.3,3.2,2.8,7,2.8 c3.3,0,5.6-1.1,6.6-2.1c0.9-1.1,2.3-1.7,3.9-1.7h2.9c1.5,0,2.9,0.6,3.9,1.7c0.9,1.1,3.3,2.1,6.6,2.1c3.2,0,5.6-1.1,6.6-2.1 c0.9-1.1,2.3-1.7,3.9-1.7h2.4c1.5,0,2.9,0.6,3.9,1.7c0.9,1.1,3.3,2.1,6.6,2.1c3.7,0,6.5-1.4,6.9-2.8c0.2-0.6,0.8-1,1.4-1H82 c0.8,0,1.5,0.7,1.5,1.5v6C83.5,75.9,78.7,80.7,72.8,80.7z M18.9,67.6V70c0,4.2,3.4,7.7,7.7,7.7h46.2c4.2,0,7.7-3.4,7.7-7.7v-2.8 c-1.8,1.3-4.5,2-7.5,2c-3.7,0-7.1-1.2-8.8-3.2c-0.3-0.4-0.9-0.6-1.6-0.6h-2.4c-0.6,0-1.2,0.2-1.6,0.6c-1.7,2-5.1,3.2-8.8,3.2 c-3.7,0-7.1-1.2-8.8-3.2c-0.3-0.4-0.9-0.6-1.6-0.6h-2.9c-0.6,0-1.2,0.2-1.6,0.6c-1.7,2-5.1,3.2-8.8,3.2 C23.2,69.3,20.8,68.7,18.9,67.6z M80.3,57.5H19.9c-3.9,0-7.1-3.3-7.1-7.4c0-2,0.7-3.8,2-5.2c1.4-1.4,3.1-2.2,5-2.2h41 c0.5,0,1,0.3,1.3,0.7l2.1,3.5l4.6-3.9c0.3-0.2,0.6-0.4,1-0.4h10.5c3.9,0,7.1,3.3,7.1,7.4c0,2-0.7,3.8-2,5.2 C84,56.7,82.2,57.5,80.3,57.5z M19.9,45.6c-1.1,0-2.1,0.4-2.9,1.3c-0.8,0.8-1.2,2-1.2,3.2c0,2.4,1.8,4.4,4.1,4.4h60.4 c1.1,0,2.1-0.4,2.9-1.3c0.8-0.8,1.2-2,1.2-3.2c0-2.4-1.8-4.4-4.1-4.4h-9.9l-5.5,4.7c-0.3,0.3-0.8,0.4-1.2,0.3 c-0.4-0.1-0.8-0.3-1-0.7L60,45.6H19.9z M63.9,50.7c-0.1,0-0.2,0-0.2,0c-0.4-0.1-0.8-0.3-1-0.7L60,45.6H20.1c-0.8,0-1.5-0.7-1.5-1.5 v-6.8c0-0.8,0.7-1.5,1.5-1.5h59.3c0.8,0,1.5,0.7,1.5,1.5v6.8c0,0.8-0.7,1.5-1.5,1.5h-9l-5.5,4.7C64.6,50.6,64.3,50.7,63.9,50.7z M21.6,42.6h39.2c0.5,0,1,0.3,1.3,0.7l2.1,3.5l4.6-3.9c0.3-0.2,0.6-0.4,1-0.4h8v-3.8H21.6V42.6z M61.9,41.3 M73,69.3 c-4.2,0-7.8-1.5-9.3-3.8H59c-1.5,2.3-5.1,3.8-9.3,3.8c-4.2,0-7.8-1.5-9.3-3.8h-5.2c-1.5,2.3-5.1,3.8-9.3,3.8c-4.4,0-8.1-1.6-9.4-4 c-2.3-0.7-3.9-2.8-3.9-5.2c0-2.5,1.8-4.7,4.2-5.3c0.2-0.1,0.4-0.1,0.6-0.1H82c3,0,5.4,2.4,5.4,5.4c0,2.9-2.3,5.3-5.1,5.4 C80.8,67.8,77.2,69.3,73,69.3z M58.1,62.5h6.5c0.6,0,1.2,0.4,1.4,1c0.4,1.3,3.2,2.8,7,2.8c3.7,0,6.5-1.4,6.9-2.8 c0.2-0.6,0.8-1,1.4-1H82c1.3,0,2.4-1.1,2.4-2.4c0-1.3-1.1-2.4-2.4-2.4H17.8c-0.1,0-0.1,0-0.2,0c-1.2,0.2-2.1,1.2-2.1,2.4 s0.9,2.2,2.1,2.4c0.2,0,0.3,0.1,0.4,0.1c0.4,0.2,0.8,0.5,0.9,0.9c0.4,1.3,3.2,2.8,7,2.8c3.7,0,6.5-1.4,6.9-2.8c0.2-0.6,0.8-1,1.4-1 h7c0.6,0,1.2,0.4,1.4,1c0.4,1.3,3.2,2.8,6.9,2.8c3.7,0,6.5-1.4,6.9-2.8C56.9,62.9,57.4,62.5,58.1,62.5z M82,38.9H17.4 c-0.8,0-1.5-0.7-1.5-1.5v-1.8c0-9,7.3-16.3,16.3-16.3h34.9c9,0,16.3,7.3,16.3,16.3v1.8C83.5,38.2,82.8,38.9,82,38.9z M18.9,35.9 h61.6v-0.3c0-7.3-6-13.3-13.3-13.3H32.3c-7.3,0-13.3,6-13.3,13.3V35.9z M31.6,31.4l3.8-3.8c0.6-0.6,0.6-1.5,0-2.1 c-0.6-0.6-1.5-0.6-2.1,0l-3.8,3.8c-0.6,0.6-0.6,1.5,0,2.1c0.3,0.3,0.7,0.4,1.1,0.4C30.9,31.8,31.3,31.6,31.6,31.4z M48.9,31.4 l3.8-3.8c0.6-0.6,0.6-1.5,0-2.1c-0.6-0.6-1.5-0.6-2.1,0l-3.8,3.8c-0.6,0.6-0.6,1.5,0,2.1c0.3,0.3,0.7,0.4,1.1,0.4 C48.2,31.8,48.6,31.6,48.9,31.4z M65.6,31.4l3.8-3.8c0.6-0.6,0.6-1.5,0-2.1c-0.6-0.6-1.5-0.6-2.1,0l-3.8,3.8 c-0.6,0.6-0.6,1.5,0,2.1c0.3,0.3,0.7,0.4,1.1,0.4C64.9,31.8,65.3,31.6,65.6,31.4z"></path> </g> <g id="_x35_"></g> <g id="_x36_"></g> <g id="_x37_"></g> <g id="_x38_"></g> <g id="_x39_"></g> <g id="_x31_0"></g> <g id="_x31_1"></g> <g id="_x31_2"></g> <g id="_x31_3"></g> <g id="_x31_4"></g> <g id="_x31_5"></g> <g id="_x31_6"></g> <g id="_x31_7"></g> <g id="_x31_8"></g> <g id="_x31_9"></g> <g id="_x32_0"></g> <g id="_x32_1"></g> <g id="_x32_2"></g> <g id="_x32_3"></g> <g id="_x32_4"></g> </g></svg>
+						<div class="topicos menu-topic-grid">
+							<button type="button" class="card menu-topic-card" data-view="lanches" data-scroll-to="sec-lanches">
+								<span class="menu-topic-eyebrow" aria-hidden="true">
+									<svg viewBox="0 0 24 24" fill="none">
+										<path d="M4 10h16c-.3-2.9-2.6-5-5.4-5H9.4C6.6 5 4.3 7.1 4 10z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+										<path d="M3.5 12.5h17a2 2 0 0 1-2 2H5.5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+										<path d="M5 17h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+										<circle cx="8" cy="8" r=".6" fill="currentColor"/>
+										<circle cx="12" cy="7.3" r=".6" fill="currentColor"/>
+										<circle cx="16" cy="8" r=".6" fill="currentColor"/>
+									</svg>
+								</span>
+								<h3>Lanches</h3>
+								<p>Brioche, smash, frango e receitas da casa.</p>
+							</button>
+							<button type="button" class="card menu-topic-card" data-view="lanches" data-scroll-to="sec-adicionais">
+								<span class="menu-topic-eyebrow" aria-hidden="true">
+									<svg viewBox="0 0 24 24" fill="none">
+										<circle cx="12" cy="12" r="7.5" stroke="currentColor" stroke-width="1.8"/>
+										<path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+										<path d="M18 5.5l.9 2.2 2.1.9-2.1.9-.9 2.2-.9-2.2-2.1-.9 2.1-.9.9-2.2z" fill="currentColor"/>
+									</svg>
+								</span>
+								<h3>Adicionais</h3>
+								<p>Smash extra, bacon, queijos e molhos especiais.</p>
+							</button>
+							<button type="button" class="card menu-topic-card" data-view="lanches" data-scroll-to="sec-porcoes">
+								<span class="menu-topic-eyebrow" aria-hidden="true">
+									<svg viewBox="0 0 24 24" fill="none">
+										<path d="M7 7.5h10l-1.2 10.5H8.2L7 7.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+										<path d="M9.2 5.5v3M12 4.8v3.7M14.8 5.5v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+										<path d="M6 10.8h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+									</svg>
+								</span>
+								<h3>Porções</h3>
+								<p>Batatas, nuggets e chicken bites.</p>
+							</button>
+							<button type="button" class="card menu-topic-card" data-view="lanches" data-scroll-to="sec-sobremesa">
+								<span class="menu-topic-eyebrow" aria-hidden="true">
+									<svg viewBox="0 0 24 24" fill="none">
+										<path d="M12 4.5a3.8 3.8 0 0 0-3.8 3.8c0 1.3.7 2.4 1.8 3.1l2 3 2-3a3.8 3.8 0 0 0 1.8-3.1A3.8 3.8 0 0 0 12 4.5z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+										<path d="M10.5 14.5l1.5 4.5 1.5-4.5h-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+										<path d="M9.5 21h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+									</svg>
+								</span>
+								<h3>Sobremesa</h3>
+								<p>Brownie com sorvete para fechar o pedido.</p>
+							</button>
 						</div>
-						<div class="card" data-view="porcoes">
-							<h1><b>PORÇÕES</b></h1>
-							<svg fill="#000000" viewBox="0 0 100 100" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="icon"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="_x31_"></g> <g id="_x32_"> <path d="M73.8,86.5C73.8,86.5,73.8,86.5,73.8,86.5c-0.8,0-47.2,0-47.6,0c-0.8,0-1.4-0.6-1.5-1.4l-5-53.1c0-0.4,0.1-0.8,0.4-1.2 c0.3-0.3,0.7-0.5,1.1-0.5h10.2c0.8,0,1.5,0.7,1.5,1.5c0,4.6,1.8,8.8,5,12.1c0.1,0.1,0.3,0.3,0.4,0.4c2.1,1.9,4.6,3.3,7.3,4 c0,0,0,0,0.1,0c0,0,0,0,0,0c2.3,0.6,4.9,0.7,7.2,0.3c0.2,0,0.4-0.1,0.6-0.1c2.7-0.6,5.2-1.8,7.3-3.5c0.1-0.1,0.3-0.2,0.4-0.4 c3.7-3.3,5.8-8,5.8-12.9c0-0.8,0.7-1.5,1.5-1.5h10.2c0.4,0,0.8,0.2,1.1,0.5c0.3,0.3,0.4,0.7,0.4,1.2l-5,53.1 C75.2,85.9,74.6,86.5,73.8,86.5z M22.8,33.4l4.7,50.1c7,0,38,0,44.9,0l4.7-50.1H70c-0.4,5.2-2.8,10.1-6.8,13.6 c-0.1,0.1-0.3,0.3-0.5,0.4c-2.5,2-5.4,3.5-8.5,4.1c-0.2,0.1-0.5,0.1-0.8,0.2c-2.7,0.5-5.7,0.4-8.4-0.3c-0.1,0-0.2,0-0.3-0.1 c-3.1-0.9-6-2.5-8.4-4.7c-0.2-0.2-0.3-0.3-0.5-0.5c-3.4-3.4-5.4-7.9-5.8-12.7H22.8z M36.8,46.5c-0.4,0-0.8-0.2-1.1-0.4 c-3.4-3.4-5.4-7.9-5.8-12.7h-1c-0.8,0-1.5-0.7-1.5-1.5V15c0-0.8,0.7-1.5,1.5-1.5h7.9c0.8,0,1.5,0.7,1.5,1.5v30 c0,0.6-0.4,1.2-0.9,1.4C37.2,46.5,37,46.5,36.8,46.5z M30.4,30.4h1c0.8,0,1.5,0.7,1.5,1.5c0,3.1,0.8,6.1,2.4,8.8V16.5h-4.9V30.4z M45.2,51.3c-0.1,0-0.3,0-0.4-0.1c-3.2-0.8-6.1-2.5-8.5-4.7c-0.3-0.3-0.5-0.7-0.5-1.1V24.4c0-0.8,0.7-1.5,1.5-1.5h7.9 c0.8,0,1.5,0.7,1.5,1.5v25.5c0,0.5-0.2,0.9-0.6,1.2C45.8,51.2,45.5,51.3,45.2,51.3z M38.8,44.8c1.5,1.3,3.1,2.3,4.9,3V25.9h-4.9 V44.8z M62.3,47.3c-0.2,0-0.4,0-0.6-0.1c-0.5-0.2-0.9-0.8-0.9-1.4V15c0-0.8,0.7-1.5,1.5-1.5h7.9c0.8,0,1.5,0.7,1.5,1.5v16.9 c0,0.8-0.7,1.5-1.5,1.5H70c-0.4,5.2-2.8,10.1-6.8,13.6C63,47.2,62.6,47.3,62.3,47.3z M63.8,16.5V42c2.1-2.9,3.3-6.5,3.3-10.1 c0-0.8,0.7-1.5,1.5-1.5h0.1V16.5H63.8z M53.9,51.6c-0.3,0-0.7-0.1-0.9-0.3c-0.4-0.3-0.6-0.7-0.6-1.2V24.4c0-0.8,0.7-1.5,1.5-1.5 h7.9c0.8,0,1.5,0.7,1.5,1.5v21.9c0,0.4-0.2,0.9-0.5,1.2c-2.5,2-5.4,3.5-8.5,4.1C54.1,51.6,54,51.6,53.9,51.6z M55.4,25.9v22.3 c1.8-0.6,3.4-1.5,4.9-2.6V25.9H55.4z M50,52c-1.7,0-3.5-0.2-5.1-0.7c-0.7-0.2-1.1-0.8-1.1-1.5V19.4c0-0.8,0.7-1.5,1.5-1.5h7.9 c0.8,0,1.5,0.7,1.5,1.5v30.9c0,0.7-0.5,1.4-1.2,1.5C52.3,51.9,51.2,52,50,52z M46.8,48.7c1.6,0.3,3.3,0.4,4.9,0.2V20.9h-4.9V48.7z M49.8,79.1c-5.6,0-10.1-4.5-10.1-10.1s4.5-10.1,10.1-10.1S59.9,63.4,59.9,69S55.4,79.1,49.8,79.1z M49.8,61.9 c-3.9,0-7.1,3.2-7.1,7.1s3.2,7.1,7.1,7.1s7.1-3.2,7.1-7.1S53.7,61.9,49.8,61.9z"></path> </g> <g id="_x33_"></g> <g id="_x34_"></g> <g id="_x35_"></g> <g id="_x36_"></g> <g id="_x37_"></g> <g id="_x38_"></g> <g id="_x39_"></g> <g id="_x31_0"></g> <g id="_x31_1"></g> <g id="_x31_2"></g> <g id="_x31_3"></g> <g id="_x31_4"></g> <g id="_x31_5"></g> <g id="_x31_6"></g> <g id="_x31_7"></g> <g id="_x31_8"></g> <g id="_x31_9"></g> <g id="_x32_0"></g> <g id="_x32_1"></g> <g id="_x32_2"></g> <g id="_x32_3"></g> <g id="_x32_4"></g> </g></svg>
-						</div>
-						<div class="card" data-view="soremesas">
-							<h1><b>SOBREMESAS</b></h1>
-							<svg fill="#000000" viewBox="0 0 100 100" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="icon"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="_x31_"></g> <g id="_x32_"></g> <g id="_x33_"></g> <g id="_x34_"></g> <g id="_x35_"></g> <g id="_x36_"></g> <g id="_x37_"></g> <g id="_x38_"></g> <g id="_x39_"></g> <g id="_x31_0"></g> <g id="_x31_1"></g> <g id="_x31_2"></g> <g id="_x31_3"></g> <g id="_x31_4"> <path d="M57.4,88.5H42.6c-0.8,0-1.4-0.6-1.5-1.3l-3-23.3c-0.1-0.4,0.1-0.9,0.4-1.2c0.3-0.3,0.7-0.5,1.1-0.5h20.8 c0.4,0,0.8,0.2,1.1,0.5c0.3,0.3,0.4,0.8,0.4,1.2l-3,23.3C58.8,88,58.1,88.5,57.4,88.5z M43.9,85.5h12.1l2.6-20.3H41.3L43.9,85.5z M61.7,65.3H38.3c-5.1,0-9.3-4.2-9.3-9.3V44.3c0-0.8,0.7-1.5,1.5-1.5h23.3c0.8,0,1.5,0.7,1.5,1.5v3.5c0,1.6,1.3,2.9,2.9,2.9 c1.6,0,2.9-1.3,2.9-2.9v-3.5c0-0.8,0.7-1.5,1.5-1.5h7c0.8,0,1.5,0.7,1.5,1.5V56C71,61.1,66.8,65.3,61.7,65.3z M32,45.8V56 c0,3.5,2.8,6.3,6.3,6.3h23.4c3.5,0,6.3-2.8,6.3-6.3V45.8h-4v2c0,3.2-2.6,5.9-5.9,5.9c-3.2,0-5.9-2.6-5.9-5.9v-2H32z M58.1,53.6 c-3.2,0-5.9-2.6-5.9-5.9v-2H31.9c-3.5,0-6.4-3.1-6.4-6.9c0-2.9,1.7-5.4,4-6.4c0-0.2,0-0.4,0-0.6c0-3.8,2.9-6.9,6.4-6.9h1.2 C37,24.5,37,24.1,37,23.6c0-3.8,2.9-6.9,6.4-6.9h8.9c3.4-3.3,5.4-6.4,5.4-8.2c0-0.8,0.6-1.5,1.4-1.5c0.8-0.1,1.5,0.5,1.6,1.3 l1.1,8.5c3,0.5,5.3,3.4,5.3,6.8c0,0.6-0.1,1.3-0.2,1.9c2.3,1,4,3.5,4,6.4c0,0.2,0,0.5,0,0.8c2.2,1.1,3.6,3.5,3.6,6.2 c0,3.8-2.9,6.9-6.4,6.9H64v2C64,51,61.4,53.6,58.1,53.6z M36,28c-1.9,0-3.4,1.7-3.4,3.9c0,0.4,0.1,0.8,0.2,1.2 c0.1,0.4,0.1,0.9-0.2,1.2S32,34.9,31.5,35c-1.7,0.2-3,1.9-3,3.8c0,2.2,1.5,3.9,3.4,3.9h21.8c0.8,0,1.5,0.7,1.5,1.5v3.5 c0,1.6,1.3,2.9,2.9,2.9c1.6,0,2.9-1.3,2.9-2.9v-3.5c0-0.8,0.7-1.5,1.5-1.5h5.6c1.9,0,3.4-1.7,3.4-3.9c0-1.8-1.1-3.4-2.7-3.8 c-0.4-0.1-0.7-0.4-0.9-0.7c-0.2-0.4-0.3-0.8-0.1-1.2c0.1-0.5,0.2-0.9,0.2-1.3c0-2-1.4-3.7-3.1-3.9c-0.5,0-1-0.3-1.2-0.8 c-0.2-0.5-0.2-1,0-1.4c0.4-0.7,0.6-1.4,0.6-2.2c0-2.2-1.5-3.9-3.4-3.9h-0.3c-0.8,0-1.4-0.6-1.5-1.3l-0.6-4.2 c-1.1,1.6-2.6,3.3-4.5,5.1c-0.3,0.3-0.6,0.4-1,0.4h-9.5c-1.9,0-3.4,1.8-3.4,3.9c0,0.7,0.2,1.5,0.6,2.1c0.3,0.5,0.3,1,0,1.5 c-0.3,0.5-0.8,0.7-1.3,0.7H36z M59.1,27c0-0.8-0.7-1.5-1.5-1.5H50c-0.8,0-1.5,0.7-1.5,1.5s0.7,1.5,1.5,1.5h7.6 C58.5,28.5,59.1,27.8,59.1,27z M49.1,36c0-0.8-0.7-1.5-1.5-1.5H40c-0.8,0-1.5,0.7-1.5,1.5s0.7,1.5,1.5,1.5h7.6 C48.5,37.5,49.1,36.8,49.1,36z M41.9,60.6c-3.3,0-6-2.7-6-6s2.7-6,6-6s6,2.7,6,6S45.2,60.6,41.9,60.6z M41.9,51.6c-1.7,0-3,1.3-3,3 s1.3,3,3,3s3-1.3,3-3S43.5,51.6,41.9,51.6z"></path> </g> <g id="_x31_5"></g> <g id="_x31_6"></g> <g id="_x31_7"></g> <g id="_x31_8"></g> <g id="_x31_9"></g> <g id="_x32_0"></g> <g id="_x32_1"></g> <g id="_x32_2"></g> <g id="_x32_3"></g> <g id="_x32_4"></g> </g></svg>
-						</div>
-						<div class="card" data-view="bebidas">
-							<h1><b>BEBIDAS</b></h1>
-							<svg fill="#000000" viewBox="-2 0 16 16" id="drink-milk-coffee-16px" xmlns="http://www.w3.org/2000/svg" class="icon"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path id="Path_124" data-name="Path 124" d="M254-25.5a.469.469,0,0,0-.013-.063.422.422,0,0,0-.02-.1.467.467,0,0,0-.041-.084.479.479,0,0,0-.054-.079.477.477,0,0,0-.071-.063.408.408,0,0,0-.078-.052.419.419,0,0,0-.094-.033.47.47,0,0,0-.063-.022c-.011,0-.021,0-.032,0S253.512-26,253.5-26h-11a.321.321,0,0,0-.033.007c-.012,0-.022,0-.033,0a.47.47,0,0,0-.063.022.419.419,0,0,0-.094.033.408.408,0,0,0-.078.052.477.477,0,0,0-.071.063.479.479,0,0,0-.054.079.467.467,0,0,0-.041.084.422.422,0,0,0-.02.1A.469.469,0,0,0,242-25.5c0,.011.006.02.006.031s0,.023,0,.035l2,15a.581.581,0,0,0,.024.074.661.661,0,0,0,.025.075.5.5,0,0,0,.06.089.457.457,0,0,0,.048.059.451.451,0,0,0,.1.065.669.669,0,0,0,.057.035A.5.5,0,0,0,244.5-10h7a.5.5,0,0,0,.185-.037.669.669,0,0,0,.057-.035.451.451,0,0,0,.1-.065.457.457,0,0,0,.048-.059.5.5,0,0,0,.06-.089.661.661,0,0,0,.025-.075.581.581,0,0,0,.024-.074l2-15c0-.012,0-.023,0-.035S254-25.489,254-25.5Zm-10.193,6.014,7.339,7.34a.615.615,0,0,0,.063.041l-.147,1.1h-.355l-6.656-6.656Zm7.566,6.152L244.707-20h1.586l5.267,5.267ZM247.707-20h1.586l2.62,2.62-.187,1.4Zm3,0h1.555l-.183,1.372Zm-7.1-1-.533-4h9.856l-.533,4Zm1.125,8.437L246.293-11h-1.355Zm-.218-1.632-.244-1.83L249.293-11h-1.586Z" transform="translate(-242 26)"></path> </g></svg>
-						</div>
-					</div>
 				</div>
+
 				<div class="cardapio" id="lanches">
-					<div class="lanches">
-						<!-- Cardapio.html -->
+					<div class="menu-catalog-shell" id="menuCatalogContent">
+						<div class="panel" style="text-align: center; color: var(--muted);">Carregando cardápio...</div>
 					</div>
 				</div>
+
+				<template id="cardapioFallbackTemplate">
+					<div class="menu-board">
+						<div class="menu-board-header">
+							<div>
+								<h2>Cardápio Oficial Flash Burguer</h2>
+								<p>Sem bebidas no foodtruck. Cardápio organizado por seções para facilitar o atendimento.</p>
+							</div>
+							<button type="button" class="menu-back-btn" data-view="Voltar">← Voltar para categorias</button>
+						</div>
+
+						<div class="menu-sections">
+							<section class="menu-section" id="sec-lanches">
+								<div class="menu-section-heading">Lanches</div>
+								<div class="menu-section-sub">Receitas principais com pão brioche e proteínas selecionadas.</div>
+								<div class="menu-items">
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">X-Burguer</h3>
+											<span class="menu-item-price">R$ 20</span>
+										</div>
+										<p class="menu-item-desc">Pão brioche, smash 100g, queijo premium, cebola, ketchup e mostarda.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">X-Salada</h3>
+											<span class="menu-item-price">R$ 22</span>
+										</div>
+										<p class="menu-item-desc">Pão brioche, smash 100g, queijo premium, cebola, ketchup, mostarda, maionese, alface e tomate.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">X-Bacon</h3>
+											<span class="menu-item-price">R$ 25</span>
+										</div>
+										<p class="menu-item-desc">Pão brioche, smash 100g, queijo premium, ketchup, bacon e maionese de bacon.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Flash Burguer Salada</h3>
+											<span class="menu-item-price">R$ 30</span>
+										</div>
+										<p class="menu-item-desc">Pão brioche, 2 smash 100g, queijo premium, cebola, maionese, alface e tomate.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Flash Burguer Bacon</h3>
+											<span class="menu-item-price">R$ 35</span>
+										</div>
+										<p class="menu-item-desc">Pão brioche, 2 smash 100g, queijo premium, ketchup, bacon e maionese de bacon.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Flash Chicken Salada</h3>
+											<span class="menu-item-price">R$ 25</span>
+										</div>
+										<p class="menu-item-desc">Pão brioche, peito de frango empanado 120g, queijo premium, cebola, maionese, alface e tomate.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Flash Chicken Bacon</h3>
+											<span class="menu-item-price">R$ 30</span>
+										</div>
+										<p class="menu-item-desc">Pão brioche, peito de frango empanado 120g, queijo premium, bacon e maionese de bacon.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Flash Burguer Catupiry</h3>
+											<span class="menu-item-price">R$ 28</span>
+										</div>
+										<p class="menu-item-desc">Pão brioche, smash 100g, bacon, catupiry e molho barbecue.</p>
+									</article>
+								</div>
+							</section>
+
+							<section class="menu-section" id="sec-adicionais">
+								<div class="menu-section-heading">Adicionais</div>
+								<div class="menu-section-sub">Monte seu lanche com complementos avulsos.</div>
+								<div class="menu-items">
+									<article class="menu-item menu-item-compact">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Smash 100g</h3>
+											<span class="menu-item-price">R$ 10</span>
+										</div>
+									</article>
+									<article class="menu-item menu-item-compact">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Bacon</h3>
+											<span class="menu-item-price">R$ 5</span>
+										</div>
+									</article>
+									<article class="menu-item menu-item-compact">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Queijo Premium</h3>
+											<span class="menu-item-price">R$ 4</span>
+										</div>
+									</article>
+									<article class="menu-item menu-item-compact">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Cheddar Cremoso</h3>
+											<span class="menu-item-price">R$ 8</span>
+										</div>
+									</article>
+									<article class="menu-item menu-item-compact">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Catupiry</h3>
+											<span class="menu-item-price">R$ 8</span>
+										</div>
+									</article>
+									<article class="menu-item menu-item-compact">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Molho Adicional</h3>
+											<span class="menu-item-price">R$ 4</span>
+										</div>
+										<p class="menu-item-desc">Barbecue Jack Daniel's, maionese de bacon ou mostarda e mel.</p>
+									</article>
+								</div>
+							</section>
+
+							<section class="menu-section" id="sec-porcoes">
+								<div class="menu-section-heading">Porções</div>
+								<div class="menu-section-sub">Acompanhamentos para consumo individual ou compartilhado.</div>
+								<div class="menu-items">
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Batata Pequena</h3>
+											<span class="menu-item-price">R$ 15</span>
+										</div>
+										<p class="menu-item-desc">Batata 250g.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Batata Flash Pequena</h3>
+											<span class="menu-item-price">R$ 25</span>
+										</div>
+										<p class="menu-item-desc">Batata 250g + cheddar e bacon.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Batata Grande</h3>
+											<span class="menu-item-price">R$ 25</span>
+										</div>
+										<p class="menu-item-desc">Batata 500g.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Batata Flash Grande</h3>
+											<span class="menu-item-price">R$ 35</span>
+										</div>
+										<p class="menu-item-desc">Batata 500g + cheddar e bacon.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Nuggets com Queijo</h3>
+											<span class="menu-item-price">R$ 20</span>
+										</div>
+										<p class="menu-item-desc">Nuggets recheados com queijo.</p>
+									</article>
+
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Flash Chicken Bites</h3>
+											<span class="menu-item-price">R$ 28</span>
+										</div>
+										<p class="menu-item-desc">Iscas de frango empanado 300g + molho barbecue Jack Daniel's ou mostarda e mel.</p>
+									</article>
+								</div>
+							</section>
+
+							<section class="menu-section" id="sec-sobremesa">
+								<div class="menu-section-heading">Sobremesa</div>
+								<div class="menu-items">
+									<article class="menu-item">
+										<div class="menu-item-head">
+											<h3 class="menu-item-name">Brownie com Sorvete</h3>
+											<span class="menu-item-price">R$ 18</span>
+										</div>
+									</article>
+								</div>
+							</section>
+						</div>
+					</div>
+				</template>
 			</div>
 		</div>
 
 		<!-- ========== PDV ========== -->
+
 		<div id="pdv" class="view">
 			<div class="topbar">
 				<div>
 					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
-					<h1>Ingredientes — Seleção para Produção</h1>
+					<h1>Ingredientes + Adicionais — Seleção para Produção</h1>
 				</div>
-				<div class="meta">Integrado com SDK Rede (Laranjinha Smart)</div>
+				<div class="meta">Integrado com Mercado Pago Point</div>
 			</div>
 
-			<div style="display: grid; grid-template-columns: 1fr 320px; gap: 14px;">
+			<div style="display: grid; grid-template-columns: 1fr; gap: 14px;">
 				<div>
 					<h2>Ingredientes e Bases</h2>
 					<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px;">
@@ -250,30 +570,9 @@
 						<button class="btn-secondary drink-tab" data-type="molhos" onclick="filterByType('molhos'); renderProducts();">Molhos</button>
 					</div>
 					<div class="products-grid" id="productsGrid"></div>
-				</div>
-				<div class="CS">
-					<!--Locao do Cart Selection-->
-				</div>
-			</div>
-		</div>
 
-		<!--========== ADICIONAIS ========== -->
-		<div id="tabacaria" class="view">
-			<div class="topbar">
-				<div>
-					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
-					<h1>Adicionais e Porções</h1>
-				</div>
-			</div>
-
-			<div style="display: grid; grid-template-columns: 1fr 320px; gap: 14px;">
-				<div>
-					<h2>Itens Complementares</h2>
+					<h2 style="margin-top: 22px;">Adicionais e Porções</h2>
 					<div class="products-grid" id="tabacariGrid"></div>
-				</div>
-
-				<div class="CS">
-					<!--Locao do Cart Selection-->
 				</div>
 			</div>
 		</div>
@@ -283,13 +582,13 @@
 			<div class="topbar">
 				<div>
 					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
-					<h1>Estoque + Maquininha API REDE</h1>
+					<h1>Estoque + Maquininha API Mercado Pago</h1>
 				</div>
 			</div>
 
-			<div class="grid-2">
-				<div class="panel">
-					<h3 class="section-title">📝 Cadastrar Novo Produto</h3>
+				<div class="grid-2">
+					<div class="panel">
+						<h3 class="section-title">📝 Cadastrar Novo Produto</h3>
 					<div class="input-field">
 						<label>Nome do Produto <span style="color: rgb(255, 110, 105);">*</span></label>
 						<input type="text" id="newProductName" placeholder="Ex: Blend Bovino 100g">
@@ -371,11 +670,36 @@
 							<div id="totalSalesValue" style="color: #8ae08a; font-weight: bold;">R$ 0,00</div>
 						</div>
 					</div>
+					</div>
 				</div>
-			</div>
 
-			<div class="grid-2">
-				<div class="panel">
+				<div class="panel ingredient-guide-panel">
+					<h3 class="section-title">Guia de Ingredientes para Automação</h3>
+					<p class="ingredient-guide-intro">
+						O sistema foi zerado para cadastro manual. Cadastre os ingredientes abaixo para liberar a automação completa de baixa no cardápio.
+					</p>
+					<div id="inventoryIngredientGuideSummary" class="ingredient-guide-summary">
+						Obrigatórios para automação: 0 • Cadastrados: 0 • Faltando: 0
+					</div>
+					<table class="table-simple ingredient-guide-table">
+						<thead>
+							<tr>
+								<th>Ingrediente obrigatório</th>
+								<th>Status</th>
+								<th>Vínculo no estoque</th>
+								<th>Ação</th>
+							</tr>
+						</thead>
+						<tbody id="inventoryIngredientGuideTableBody">
+							<tr>
+								<td colspan="4" style="text-align:center; color: var(--muted);">Nenhum item carregado.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+	
+				<div class="grid-2">
+					<div class="panel">
 					<h3 class="section-title">Produtos em Estoque</h3>
 					<table id="inventoryTable" class="table-simple">
 						<thead>
@@ -395,12 +719,12 @@
 				</div>
 
 				<div class="panel">
-					<h3 class="section-title">Status Maquininha API REDE</h3>
+					<h3 class="section-title">Status Maquininha API Mercado Pago</h3>
 					<div id="inventoryMachineStatus" style="font-size: 12px; line-height: 1.8; background: #131d13; border: 1px solid #2d412d; border-radius: 8px; padding: 10px;">
-						<div><strong style="color: #8ae08a;">Provedor:</strong> <span id="invProvider">REDE</span></div>
-						<div><strong style="color: #8ae08a;">Terminal:</strong> <span id="invTerminal">POS-001</span></div>
+						<div><strong style="color: #8ae08a;">Provedor:</strong> <span id="invProvider">MERCADO_PAGO_POINT</span></div>
+						<div><strong style="color: #8ae08a;">Device:</strong> <span id="invTerminal">MP-POINT-001</span></div>
 						<div><strong style="color: #8ae08a;">Modo:</strong> <span id="invMode">Sandbox</span></div>
-						<div><strong style="color: #8ae08a;">URL API:</strong> <span id="invApiUrl">api-sandbox.rede.com.br</span></div>
+						<div><strong style="color: #8ae08a;">URL API:</strong> <span id="invApiUrl">api.mercadopago.com/point/integration-api</span></div>
 						<div><strong style="color: #8ae08a;">Conectividade:</strong> <span id="invConnectivity">Operacional</span></div>
 						<div><strong style="color: #8ae08a;">Último ping:</strong> <span id="invLastPing">há 18s</span></div>
 						<div><strong style="color: #8ae08a;">Itens críticos:</strong> <span id="invLowStockCount">--</span></div>
@@ -408,7 +732,7 @@
 					<div id="inventoryCriticalList" style="margin-top: 8px; font-size: 11px; color: #9ca3af;">Carregando dados do backend...</div>
 					<div style="margin-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
 						<button class="btn-secondary" style="width: 100%;" onclick="refreshInventoryMachineOverview(true)">Testar API</button>
-						<button class="btn-secondary" style="width: 100%;" onclick="refreshInventoryMachineOverview(false)">Sincronizar POS</button>
+							<button class="btn-secondary" style="width: 100%;" onclick="refreshInventoryMachineOverview(false)">Sincronizar Point</button>
 					</div>
 				</div>
 			</div>
@@ -513,100 +837,227 @@
 			</div>
 		</div>
 
-		<!-- ========== ANÁLISES ========== -->
-		<div id="analytics" class="view">
+		<!-- ========== FISCAL ========== -->
+		<div id="fiscal" class="view">
 			<div class="topbar">
 				<div>
-					<div class="demo-badge">ANÁLISES AVANÇADAS</div>
-					<h1>Painel de Vendas com Gráficos</h1>
+					<div class="demo-badge">DEMONSTRAÇÃO VISUAL</div>
+					<h1>Módulo Fiscal Focus NFe</h1>
 				</div>
-				<div class="meta">Análise em tempo real | Últimos 30 dias</div>
+				<div class="meta">São Bernardo do Campo • IBGE 3548708</div>
 			</div>
 
-			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px;">
-				<div class="card">
-					<h2>Receita - Hoje</h2>
-					<span id="analyticsRevenueToday">R$ 0,00</span>
-					<div class="kpi-trend" id="analyticsRevenueTrend">▲ Carregando...</div>
-				</div>
-				<div class="card">
-					<h2>Receita - 30 dias</h2>
-					<span id="analyticsRevenueMonth">R$ 0,00</span>
-					<div class="kpi-trend">Período completo</div>
-				</div>
-				<div class="card">
-					<h2>Transações - Hoje</h2>
-					<span id="analyticsTicketsToday">0</span>
-					<div class="kpi-trend">Caixa aberto</div>
-				</div>
-				<div class="card">
-					<h2>Ticket Médio</h2>
-					<span id="analyticsAvgTicket">R$ 0,00</span>
-					<div class="kpi-trend">Últimos 30 dias</div>
+			<div class="panel" style="margin-bottom: 14px;">
+				<h3 class="section-title">Regras do Food Truck</h3>
+				<div class="fiscal-guidelines">
+					<div>NF-e é o fluxo padrão para venda de hambúrgueres e produtos.</div>
+					<div>NFS-e fica liberada apenas para serviços eventuais (ex.: catering/evento).</div>
+					<div>⚠️ NCM, CFOP, CST e alíquotas são configuráveis, mas exigem validação contábil antes de produção.</div>
 				</div>
 			</div>
 
 			<div class="grid-2">
-				<div class="chart-container">
-					<h3 class="section-title">Faturamento vs Transações (30 dias)</h3>
-					<div class="chart-wrapper">
-						<canvas id="revenueChart"></canvas>
+				<div class="panel">
+					<h3 class="section-title">Configuração Fiscal do Emitente</h3>
+					<div class="fiscal-form-grid">
+						<div class="input-field">
+							<label>Ambiente Focus</label>
+							<select id="fiscalAmbienteSelect">
+								<option value="homologacao">Homologação</option>
+								<option value="producao">Produção</option>
+							</select>
+						</div>
+						<div class="input-field">
+							<label>CNPJ Emitente</label>
+							<input id="fiscalEmitenteCnpj" type="text" placeholder="Somente dígitos (14)">
+						</div>
+						<div class="input-field">
+							<label>Inscrição Municipal</label>
+							<input id="fiscalEmitenteIM" type="text" placeholder="Inscrição municipal do prestador">
+						</div>
+						<div class="input-field">
+							<label>Código Município IBGE</label>
+							<input id="fiscalEmitenteMunicipio" type="text" value="3548708">
+						</div>
+						<div class="input-field fiscal-span-2">
+							<label>Razão Social Emitente</label>
+							<input id="fiscalEmitenteRazao" type="text" placeholder="Razão social do emitente">
+						</div>
 					</div>
+
+					<div class="fiscal-actions-row">
+						<button class="btn-secondary" onclick="saveFiscalSettings()">Salvar Configuração Local</button>
+						<button class="btn-secondary" onclick="refreshFiscalFocusConfig()">Consultar Config Focus</button>
+					</div>
+
+					<div id="fiscalConfigStatus" class="fiscal-inline-status">Configuração fiscal local ainda não carregada.</div>
 				</div>
-				<div class="chart-container">
-					<h3 class="section-title">Vendas por Categoria</h3>
-					<div class="chart-wrapper">
-						<canvas id="categoryChart"></canvas>
+
+				<div class="panel">
+					<h3 class="section-title">KPIs Fiscais</h3>
+					<div class="fiscal-kpis">
+						<div class="card">
+							<h2>Total Notas</h2>
+							<span id="fiscalKpiTotal">0</span>
+							<div class="kpi-trend">Histórico local</div>
+						</div>
+						<div class="card">
+							<h2>Autorizadas</h2>
+							<span id="fiscalKpiAutorizadas">0</span>
+							<div class="kpi-trend">Status aprovado/autorizado</div>
+						</div>
+						<div class="card">
+							<h2>Canceladas</h2>
+							<span id="fiscalKpiCanceladas">0</span>
+							<div class="kpi-trend">Com justificativa</div>
+						</div>
+						<div class="card">
+							<h2>Processando</h2>
+							<span id="fiscalKpiProcessando">0</span>
+							<div class="kpi-trend">Fila Focus/Prefeitura</div>
+						</div>
 					</div>
 				</div>
 			</div>
 
-			<div class="grid-2">
-				<div class="chart-container">
-					<h3 class="section-title">Top 10 Produtos Mais Vendidos</h3>
-					<table class="table-simple">
-						<thead>
-							<tr>
-								<th>Produto</th>
-								<th>Qtd</th>
-								<th>Faturamento</th>
-								<th>%</th>
-							</tr>
-						</thead>
-						<tbody id="topProductsBody">
-							<tr><td colspan="4" style="text-align: center; color: var(--muted);">Carregando...</td></tr>
-						</tbody>
-					</table>
+			<div class="panel" style="margin-top: 14px;">
+				<div class="fiscal-tabs">
+					<button class="fiscal-tab active" data-fiscal-tab="nfe" onclick="switchFiscalTab('nfe')">NF-e (Produto)</button>
+					<button class="fiscal-tab" data-fiscal-tab="nfse" onclick="switchFiscalTab('nfse')">NFS-e (Serviço)</button>
 				</div>
 
-				<div class="chart-container">
-					<h3 class="section-title">Busca Rápida de Produtos</h3>
-					<div class="search-container">
-						<span class="search-icon">•</span>
-						<input type="text" class="search-input" id="productSearchBox" placeholder="Digite nome ou código..." onkeyup="handleQuickSearch(event)">
-						<div class="search-results" id="quickSearchResults"></div>
+				<div id="fiscalPanelNfe" class="fiscal-tab-panel active">
+					<div class="fiscal-form-grid">
+						<div class="input-field">
+							<label>Reference</label>
+							<input id="fiscalNfeReference" type="text" placeholder="Ex: PEDIDO_2026_001">
+						</div>
+						<div class="input-field">
+							<label>Valor (R$)</label>
+							<input id="fiscalNfeValor" type="number" step="0.01" min="0" placeholder="30.00">
+						</div>
+						<div class="input-field">
+							<label>Cliente</label>
+							<input id="fiscalNfeCliente" type="text" placeholder="Consumidor Final">
+						</div>
+						<div class="input-field">
+							<label>Pedido</label>
+							<input id="fiscalNfePedido" type="text" placeholder="Flash Burger Salada x1">
+						</div>
+						<div class="input-field">
+							<label>NCM</label>
+							<input id="fiscalNfeNcm" type="text" value="16025000">
+						</div>
+						<div class="input-field">
+							<label>CFOP</label>
+							<input id="fiscalNfeCfop" type="text" value="5102">
+						</div>
+						<div class="input-field">
+							<label>CST</label>
+							<input id="fiscalNfeCst" type="text" value="102">
+						</div>
+						<div class="input-field">
+							<label>Alíquota ICMS (%)</label>
+							<input id="fiscalNfeAliquota" type="number" min="0" step="0.01" value="0">
+						</div>
+						<div class="input-field fiscal-span-2">
+							<label>Payload JSON NF-e (editável)</label>
+							<textarea id="fiscalNfePayload" rows="10"></textarea>
+						</div>
+						<div class="input-field fiscal-span-2">
+							<label>Justificativa de cancelamento (mín. 15 caracteres)</label>
+							<input id="fiscalNfeCancelReason" type="text" placeholder="Informe a justificativa para cancelar a nota">
+						</div>
 					</div>
-					<div style="margin-top: 12px; font-size: 11px; color: var(--muted);">
-						Digite para buscar produtos por nome ou código de barras. Clique para adicionar ao carrinho da aba Ingredientes.
+					<div class="fiscal-actions-row">
+						<button class="btn-secondary" onclick="emitFiscalNote('nfe')">Emitir NF-e</button>
+						<button class="btn-secondary" onclick="consultFiscalNote('nfe')">Consultar NF-e</button>
+						<button class="btn-secondary" onclick="cancelFiscalNote('nfe')">Cancelar NF-e</button>
 					</div>
 				</div>
+
+				<div id="fiscalPanelNfse" class="fiscal-tab-panel">
+					<div class="fiscal-form-grid">
+						<div class="input-field">
+							<label>Reference</label>
+							<input id="fiscalNfseReference" type="text" placeholder="Ex: SERVICO_EVENTO_001">
+						</div>
+						<div class="input-field">
+							<label>Valor Serviço (R$)</label>
+							<input id="fiscalNfseValor" type="number" step="0.01" min="0" placeholder="1200.00">
+						</div>
+						<div class="input-field">
+							<label>Tomador (Razão Social)</label>
+							<input id="fiscalNfseCliente" type="text" placeholder="Cliente Evento LTDA">
+						</div>
+						<div class="input-field">
+							<label>Descrição do serviço</label>
+							<input id="fiscalNfsePedido" type="text" placeholder="Catering de hambúrguer em evento">
+						</div>
+						<div class="input-field">
+							<label>Item Lista Serviço</label>
+							<input id="fiscalNfseItemLista" type="text" value="17.01">
+						</div>
+						<div class="input-field">
+							<label>Código Tributário Municipal</label>
+							<input id="fiscalNfseCodigoTributario" type="text" value="17.01/102104/1232">
+						</div>
+						<div class="input-field">
+							<label>Alíquota ISS (%)</label>
+							<input id="fiscalNfseAliquota" type="number" min="0" step="0.01" value="5">
+						</div>
+						<div class="input-field fiscal-span-2">
+							<label>Payload JSON NFS-e (editável)</label>
+							<textarea id="fiscalNfsePayload" rows="10"></textarea>
+						</div>
+						<div class="input-field fiscal-span-2">
+							<label>Justificativa de cancelamento (mín. 15 caracteres)</label>
+							<input id="fiscalNfseCancelReason" type="text" placeholder="Informe a justificativa para cancelar a nota">
+						</div>
+					</div>
+					<div class="fiscal-actions-row">
+						<button class="btn-secondary" onclick="emitFiscalNote('nfse')">Emitir NFS-e</button>
+						<button class="btn-secondary" onclick="consultFiscalNote('nfse')">Consultar NFS-e</button>
+						<button class="btn-secondary" onclick="cancelFiscalNote('nfse')">Cancelar NFS-e</button>
+					</div>
+				</div>
+
+				<div id="fiscalActionFeedback" class="fiscal-inline-status" style="margin-top: 12px;">Sem operação fiscal executada nesta sessão.</div>
 			</div>
 
-			<div style="padding: 20px; background: linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(0,0,0,0) 100%); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 12px; margin-top: 20px;">
-				<h3 style="margin-top: 0; color: var(--amarelo);">💡 Integração com Backend Node.js</h3>
-				<div style="font-size: 13px; color: var(--texto-sec); line-height: 1.8;">
-					<p>Os gráficos carregam dados via API em <strong>http://localhost:3333/api</strong></p>
-					<p style="color: #8ae08a;">✓ Endpoints implementados:</p>
-					<ul style="margin: 10px 0; padding-left: 20px;">
-						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/summary</code> - KPIs período</li>
-						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/revenue-chart</code> - Gráfico receita</li>
-						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/category-chart</code> - Gráfico categorias</li>
-						<li><code style="background: #1a1a1a; padding: 2px 6px; border-radius: 3px;">GET /api/dashboard/products-search?q=termo</code> - Busca de produtos</li>
-					</ul>
+			<div class="panel" style="margin-top: 14px;">
+				<h3 class="section-title">Notas Emitidas</h3>
+				<div class="fiscal-actions-row" style="margin-bottom: 10px;">
+					<select id="fiscalListTipo">
+						<option value="">Todos os tipos</option>
+						<option value="nfe">Somente NF-e</option>
+						<option value="nfse">Somente NFS-e</option>
+					</select>
+					<input id="fiscalListStatus" type="text" placeholder="Filtrar por status (opcional)">
+					<button class="btn-secondary" onclick="loadFiscalNotes()">Atualizar Lista</button>
 				</div>
+				<table class="table-simple">
+					<thead>
+						<tr>
+							<th>Reference</th>
+							<th>Tipo</th>
+							<th>Status</th>
+							<th>Valor</th>
+							<th>Número</th>
+							<th>Ambiente</th>
+							<th>Emitida em</th>
+							<th>Ações XML</th>
+						</tr>
+					</thead>
+					<tbody id="fiscalNotasTbody">
+						<tr>
+							<td colspan="8" style="text-align: center; color: var(--muted);">Nenhuma nota carregada.</td>
+						</tr>
+					</tbody>
+				</table>
 			</div>
 		</div>
-
+	
 		<!-- ========== SETTINGS ========== -->
 		<div id="settings" class="view">
 			<div class="topbar">
@@ -673,15 +1124,15 @@
 							<label style="font-size: 11px; color: #888;">Margem Mínima (%)</label>
 							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="36">
 						</div>
-						<div>
-							<label style="font-size: 11px; color: #888;">Ticket Médio Esperado (R$)</label>
-							<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="48"
+							<div>
+								<label style="font-size: 11px; color: #888;">Ticket Médio Esperado (R$)</label>
+								<input type="text" style="width: 100%; padding: 6px; background: #212121; border: 1px solid #333; color: #ccc; border-radius: 4px;" value="48">
+							</div>
 						</div>
 					</div>
-				</div>
 
 				<div class="panel">
-					<h3 class="section-title">Integração Rede Laranjinha Smart</h3>
+					<h3 class="section-title">Integração Mercado Pago Point</h3>
 					<div style="background: linear-gradient(135deg, #1a2a1a 0%, #1a1a2a 100%); padding: 12px; border-radius: 6px; border: 1px solid #3a4a3a; margin-bottom: 12px;">
 						<div style="display: flex; align-items: center; margin-bottom: 12px;">
 							<span id="redeStatusIndicator" style="width: 12px; height: 12px; background: #fbbf24; border-radius: 50%; margin-right: 8px; animation: pulse 2s infinite;"></span>
@@ -690,9 +1141,9 @@
 						<div style="font-size: 11px; color: #8ae08a; line-height: 1.8;">
 							<div><strong>Modo:</strong> <span id="paymentMode">Verificando...</span></div>
 							<div><strong>Servidor API:</strong> <span id="serverStatus">Conectando...</span></div>
-							<div><strong>Terminal ID:</strong> POS-001</div>
+							<div><strong>Device ID:</strong> MP-POINT-001</div>
 							<div><strong>Série:</strong> LRJ008-000421</div>
-							<div><strong>Modelo:</strong> Laranjinha Smart (Maquininha)</div>
+							<div><strong>Modelo:</strong> Point Smart (Maquininha)</div>
 							<div><strong>Firmware:</strong> v2.4.1</div>
 							<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #3a4a3a;">
 								<div><strong>Última Transação:</strong> <span id="lastTransaction">Nenhuma</span></div>
@@ -740,12 +1191,12 @@
 					<div style="background: #1a1a1a; padding: 12px; border-radius: 6px; margin-bottom: 12px;">
 						<div style="margin-bottom: 8px;">
 							<label style="font-size: 11px; color: #888;">
-								<input type="checkbox" checked> Cartão de Crédito (Rede)
+									<input type="checkbox" checked> Cartão de Crédito (Mercado Pago)
 							</label>
 						</div>
 						<div style="margin-bottom: 8px;">
 							<label style="font-size: 11px; color: #888;">
-								<input type="checkbox" checked> Cartão de Débito (Rede)
+									<input type="checkbox" checked> Cartão de Débito (Mercado Pago)
 							</label>
 						</div>
 						<div style="margin-bottom: 8px;">
@@ -803,7 +1254,16 @@
 		</div>
 	</div>
 
-	<!-- PAYMENT MODAL -->
+	<div class="global-order-guide">
+		<div class="CS">
+			<!-- Local global do card de pedido -->
+		</div>
+	</div>
+	<button id="orderCardLauncher" class="order-card-launcher" type="button" onclick="openOrderCard()" aria-label="Abrir painel de pedido para baixa">
+		🧾 Pedido para baixa (<span data-order-count>0</span>)
+	</button>
+
+
 	<div id="paymentModal" class="modal-overlay">
 		<div class="modal">
 			<h3>Processar Pagamento</h3>
@@ -812,25 +1272,25 @@
 					<div>Total:</div>
 					<div style="text-align: right; color: var(--amarelo); font-weight: bold;" id="modalTotal">R$ 0,00</div>
 					<div>Método:</div>
-					<div style="text-align: right;" id="modalMethod">Cartão (Rede)</div>
+					<div style="text-align: right;" id="modalMethod">Cartão (Mercado Pago)</div>
 				</div>
 			</div>
 
 			<div id="cardPaymentUI" style="padding: 12px; background: #1a2414; border: 1px solid #3a4a3a; border-radius: 8px; margin-bottom: 12px;">
-				<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">🔗 Integração Rede Laranjinha Smart</h4>
+				<h4 style="margin: 0 0 8px; color: #8ae08a; font-size: 13px;">🔗 Integração Mercado Pago Point</h4>
 				
-				<!-- Status Conexão -->
+				
 				<div style="font-size: 12px; color: #8ae08a; margin-bottom: 12px; padding: 8px; background: #0f1a0f; border-radius: 4px; border-left: 3px solid #8ae08a;">
 					<div style="display: flex; align-items: center; margin-bottom: 6px;">
 						<span id="connectionStatus" style="width: 12px; height: 12px; background: #8ae08a; border-radius: 50%; margin-right: 8px; display: inline-block; animation: pulse 2s infinite;"></span>
-						<strong id="connectionText">Conectado ao POS-001</strong>
+							<strong id="connectionText">Conectado à maquininha Mercado Pago Point</strong>
 					</div>
 					<div style="font-size: 11px; color: #6db86d; margin-top: 4px;">
-						Série: LRJ008-000421 | Firmware: v2.4.1
+							Device: MP-POINT-001 | Firmware: v2.4.1
 					</div>
 				</div>
 
-				<!-- Fluxo de Pagamento -->
+
 				<div id="paymentFlow" style="padding: 12px; background: #0f1a0f; border-radius: 4px;">
 					<div style="text-align: center; margin-bottom: 12px;">
 						<div style="font-size: 28px; margin-bottom: 8px;">💳</div>
@@ -845,7 +1305,7 @@
 						</div>
 					</div>
 					
-					<!-- Informações detalhadas -->
+
 					<div id="paymentDetails" style="font-size: 11px; color: #8ae08a; margin-top: 12px; display: none;">
 						<div style="padding: 8px; background: #1a2414; border-radius: 3px; line-height: 1.6;">
 							<div><strong>NSU:</strong> <span id="nsuNumber">000000</span></div>
@@ -863,20 +1323,87 @@
 		</div>
 	</div>
 
-	<script src="script.js"></script>
-	<script>
-		/** pega o conteudo do arquivo CartSection.html e insere dentro da div.CS **/
-		fetch("CartSection.html")
-			.then(response => response.text())
-			.then(data => 
-			{
-				const cart = document.querySelectorAll(".CS");
+		<script src="script.js"></script>
+		<script>
+			/** pega o conteudo do arquivo CartSection.html e insere dentro da div.CS **/
+			const fallbackCartSectionMarkup = `
+				<div class="order-card-wrapper is-collapsed">
+					<button class="order-card-toggle" type="button" onclick="openOrderCard()">
+						🧾 Pedido em aberto (<span data-order-count>0</span>)
+					</button>
+					<div class="cart-section">
+						<div class="cart-section-header" data-order-card-drag-handle>
+							<h3 style="margin-top: 0; color: var(--amarelo);">Pedido para baixa</h3>
+							<div class="cart-section-header-actions">
+								<button class="cart-minimize-btn" type="button" onclick="minimizeOrderCard()" aria-label="Minimizar card do pedido">−</button>
+								<button class="cart-close-btn" type="button" onclick="closeOrderCard()" aria-label="Fechar card do pedido">×</button>
+							</div>
+						</div>
+						<div class="order-flow-status is-empty" data-order-flow-status>
+							<div class="order-flow-title" data-order-flow-title>Sem pedido em aberto</div>
+							<div class="order-flow-text" data-order-flow-text>Adicione itens para começar um novo pedido.</div>
+						</div>
+						<div id="cartItems" class="cart-items">
+							<span style="color: var(--muted); text-align: center; font-size: 12px;">Vazio</span>
+						</div>
+						<div class="stock-consumption-card">
+							<div class="stock-consumption-title">Itens que vão dar baixa no estoque</div>
+							<div id="stockConsumptionItems" class="stock-consumption-items">
+								<div class="stock-consumption-empty">Sem itens selecionados.</div>
+							</div>
+						</div>
+						<div class="cart-summary">
+							<div class="cart-line">
+								<div>Subtotal:</div>
+								<div style="text-align: right;" id="subtotal">R$ 0,00</div>
+							</div>
+							<div class="cart-line">
+								<div>Desconto:</div>
+								<div style="text-align: right;">
+									<input type="number" id="discount" value="0" step="0.01" onchange="updateTotal()" style="width: 70px;">
+								</div>
+							</div>
+							<div class="cart-total">
+								<div id="total">R$ 0,00</div>
+							</div>
+						</div>
+						<button class="btn-pay" onclick="finalizeOrderFromCard()">Cobrar na maquininha e dar baixa</button>
+						<button class="btn-secondary" style="width: 100%; margin-top: 8px;" onclick="clearCart()">Limpar pedido</button>
+					</div>
+				</div>
+			`;
 
-				cart.forEach(cart => 
-				{
-					cart.innerHTML = data;
+			function mountCartSection(markup) {
+				const cartSlots = document.querySelectorAll(".CS");
+				cartSlots.forEach((slot) => {
+					slot.innerHTML = markup;
 				});
-			});
-	</script>
-</body>
+
+				if (typeof renderCart === 'function') {
+					renderCart();
+				}
+				if (typeof confirmBuyWindow === 'function') {
+					confirmBuyWindow();
+				}
+				if (typeof setOrderCardState === 'function') {
+					setOrderCardState(true);
+				}
+			}
+
+			fetch("CartSection.html")
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error(`Falha ao carregar CartSection.html: HTTP ${response.status}`);
+					}
+					return response.text();
+				})
+				.then((data) => {
+					mountCartSection(data);
+				})
+				.catch((error) => {
+					console.warn("⚠️ Não foi possível carregar CartSection.html, usando fallback embutido.", error.message);
+					mountCartSection(fallbackCartSectionMarkup);
+				});
+			</script>
+	</body>
 </html>

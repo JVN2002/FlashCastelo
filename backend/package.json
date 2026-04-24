@@ -7,7 +7,9 @@
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
     "migrate": "node scripts/migrate.js",
-    "seed": "node seed/seed.js"
+    "seed": "node seed/seed.js",
+    "test": "node --test tests/*.test.js",
+    "test:nfse": "node scripts/test-nfse.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

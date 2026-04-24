@@ -49,9 +49,25 @@ router.get('/overview', requireRole('admin', 'operator'), async (_req, res, next
       `
     );
 
-    const redeApiUrl = process.env.REDE_API_URL || process.env.REDE_URL || null;
-    const redeTerminal = process.env.REDE_TERMINAL_ID || process.env.REDE_TERMINAL || null;
-    const redeConfigured = Boolean(process.env.REDE_TOKEN && process.env.REDE_EC);
+    const machineApiUrl = process.env.MP_API_URL
+      ? `${process.env.MP_API_URL}/point/integration-api`
+      : (process.env.REDE_API_URL || process.env.REDE_URL || null);
+    const machineTerminal = process.env.MP_POINT_DEVICE_ID
+      || process.env.MP_DEVICE_ID
+      || process.env.REDE_TERMINAL_ID
+      || process.env.REDE_TERMINAL
+      || null;
+    const machineConfigured = Boolean(
+      process.env.MP_ACCESS_TOKEN && (process.env.MP_POINT_DEVICE_ID || process.env.MP_DEVICE_ID)
+    );
+
+    const paymentMachineApi = {
+      provider: 'MERCADO_PAGO_POINT',
+      configured: machineConfigured,
+      mode: machineConfigured ? 'PRODUCTION_OR_TEST' : 'SIMULATION',
+      api_url: machineApiUrl,
+      terminal_id: machineTerminal
+    };
 
     return res.json({
       data: {
@@ -68,13 +84,9 @@ router.get('/overview', requireRole('admin', 'operator'), async (_req, res, next
             min_stock: Number(row.min_stock)
           }))
         },
-        rede_machine_api: {
-          provider: 'REDE',
-          configured: redeConfigured,
-          mode: redeApiUrl && redeApiUrl.includes('sandbox') ? 'SANDBOX' : 'PRODUCTION',
-          api_url: redeApiUrl,
-          terminal_id: redeTerminal
-        }
+        payment_machine_api: paymentMachineApi,
+        // Alias legado para telas antigas
+        rede_machine_api: paymentMachineApi
       }
     });
   } catch (error) {

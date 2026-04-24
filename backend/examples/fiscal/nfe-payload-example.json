@@ -1,0 +1,26 @@
+{
+  "cnpj_emitente": "00000000000000",
+  "natureza_operacao": "Venda de hambúrguer no food truck",
+  "data_emissao": "2026-04-24T20:30:00-03:00",
+  "tipo_documento": 1,
+  "finalidade_emissao": 1,
+  "consumidor_final": 1,
+  "tipo_presenca_comprador": 1,
+  "modalidade_frete": 9,
+  "nome_destinatario": "Consumidor Final",
+  "items": [
+    {
+      "numero_item": 1,
+      "codigo_produto": "BURGER-001",
+      "descricao": "Flash Burger Salada",
+      "cfop": "5102",
+      "ncm": "16025000",
+      "origem": 0,
+      "unidade_comercial": "UN",
+      "quantidade_comercial": 1,
+      "valor_unitario_comercial": 30,
+      "valor_bruto": 30,
+      "cst_icms": "102"
+    }
+  ]
+}
